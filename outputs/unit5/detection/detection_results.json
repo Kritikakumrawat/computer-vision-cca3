@@ -1,0 +1,168 @@
+{
+  "task": "Unit 5A - Haar cascade and YOLO detection",
+  "status": "partial",
+  "input": "original_photo.jpg",
+  "haar": {
+    "faces": 1,
+    "face_boxes": [
+      [
+        399,
+        158,
+        393,
+        393
+      ]
+    ],
+    "eyes": 2,
+    "eye_boxes": [
+      [
+        489,
+        277,
+        70,
+        70
+      ],
+      [
+        626,
+        281,
+        71,
+        71
+      ]
+    ],
+    "time_ms": 21.370000002207235,
+    "parameters": {
+      "scale_factor": 1.1,
+      "min_neighbors": 5,
+      "min_size_fraction": 0.08
+    }
+  },
+  "yolo": {
+    "model": "yolo11n.pt",
+    "detections": [
+      {
+        "label": "person",
+        "confidence": 0.9137872457504272,
+        "box": [
+          138,
+          60,
+          1047,
+          1271
+        ]
+      }
+    ],
+    "time_ms": 62.46669999381993,
+    "confidence_threshold": 0.25
+  },
+  "yolo_error": null,
+  "haar_min_neighbors_sweep": [
+    {
+      "min_neighbors": 1,
+      "faces_detected": 5,
+      "extra_detections": 4
+    },
+    {
+      "min_neighbors": 2,
+      "faces_detected": 2,
+      "extra_detections": 1
+    },
+    {
+      "min_neighbors": 3,
+      "faces_detected": 1,
+      "extra_detections": 0
+    },
+    {
+      "min_neighbors": 5,
+      "faces_detected": 1,
+      "extra_detections": 0
+    },
+    {
+      "min_neighbors": 8,
+      "faces_detected": 1,
+      "extra_detections": 0
+    }
+  ],
+  "rotation_robustness": [
+    {
+      "angle_deg": 0,
+      "haar_faces": 1,
+      "yolo_persons": 1,
+      "yolo_best_person_conf": 0.9137872457504272,
+      "yolo_other_labels": ""
+    },
+    {
+      "angle_deg": 15,
+      "haar_faces": 1,
+      "yolo_persons": 1,
+      "yolo_best_person_conf": 0.9096627831459045,
+      "yolo_other_labels": ""
+    },
+    {
+      "angle_deg": 30,
+      "haar_faces": 0,
+      "yolo_persons": 1,
+      "yolo_best_person_conf": 0.8994300365447998,
+      "yolo_other_labels": ""
+    },
+    {
+      "angle_deg": 45,
+      "haar_faces": 0,
+      "yolo_persons": 1,
+      "yolo_best_person_conf": 0.8889086842536926,
+      "yolo_other_labels": ""
+    },
+    {
+      "angle_deg": 90,
+      "haar_faces": 0,
+      "yolo_persons": 2,
+      "yolo_best_person_conf": 0.5020757913589478,
+      "yolo_other_labels": ""
+    }
+  ],
+  "video_frames": [],
+  "comparison": [
+    {
+      "aspect": "What it detects",
+      "haar": "One object type per cascade file (here: frontal faces, eyes)",
+      "yolo": "80 COCO classes (person, chair, phone, ...) in one pass"
+    },
+    {
+      "aspect": "Output",
+      "haar": "Boxes only (no class score)",
+      "yolo": "Boxes + class label + confidence score"
+    },
+    {
+      "aspect": "Portrait result",
+      "haar": "1 face box(es), 2 eye box(es)",
+      "yolo": "person 0.91"
+    },
+    {
+      "aspect": "Time on this CPU (portrait)",
+      "haar": "21 ms (face cascade)",
+      "yolo": "62 ms (after warm-up)"
+    },
+    {
+      "aspect": "Model size / training",
+      "haar": "Small XML file shipped with OpenCV; boosted rectangle features",
+      "yolo": "Neural network weights downloaded once; trained on COCO"
+    }
+  ],
+  "observations": [
+    "Haar cascade with minNeighbors=1 returned 5 boxes for a portrait that contains 1 face: at least 4 false detection(s).",
+    "Haar cascade with minNeighbors=2 returned 2 boxes for a portrait that contains 1 face: at least 1 false detection(s).",
+    "Missed detection: the Haar cascade found 0 face(s) in the portrait rotated by 30 degrees, although the face is fully visible.",
+    "Missed detection: the Haar cascade found 0 face(s) in the portrait rotated by 45 degrees, although the face is fully visible.",
+    "Missed detection: the Haar cascade found 0 face(s) in the portrait rotated by 90 degrees, although the face is fully visible.",
+    "Duplicate/false detection: YOLO returned 2 person boxes in the portrait rotated by 90 degrees (one person present)."
+  ],
+  "pending": [
+    "Haar/YOLO on frames of the self-recorded video (inputs/original_video.mp4 not supplied)"
+  ],
+  "files": [
+    "unit5/detection/01_haar_faces_portrait.jpg",
+    "unit5/detection/02_yolo_portrait.jpg",
+    "unit5/detection/fig_haar_vs_yolo_portrait.png",
+    "unit5/detection/haar_min_neighbors_sweep.csv",
+    "unit5/detection/fig_haar_min_neighbors.png",
+    "unit5/detection/rotation_robustness.csv",
+    "unit5/detection/fig_rotation_robustness.png",
+    "unit5/detection/haar_vs_yolo_comparison.csv"
+  ]
+}

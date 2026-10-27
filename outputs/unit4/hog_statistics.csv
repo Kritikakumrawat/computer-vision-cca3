@@ -1,0 +1,4 @@
+image,hog_input_size,pixels_per_cell,cells,feature_length,expected_length,time_ms
+Original photo,495x512,8,61x64,136080,136080,484.74579999310663
+Original photo,495x512,16,30x32,32364,32364,148.1902999948943
+Original photo,495x512,32,15x16,7560,7560,56.67119999998249

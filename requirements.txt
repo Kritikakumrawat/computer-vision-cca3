@@ -1,0 +1,19 @@
+# CCA 3 computer vision assignment - Python 3.10 to 3.12 (tested on 3.11.18, Windows 11, CPU only)
+# Install with:  pip install -r requirements.txt
+# Exact versions used for the submitted results are listed in requirements-lock.txt.
+
+# Libraries required by the assignment
+numpy>=1.26,<3              # tested 2.4.6
+opencv-python>=4.10,<5      # tested 4.14.0 - includes SIFT and the Haar cascade files (code written for the OpenCV 4 API)
+matplotlib>=3.8             # tested 3.11.2
+scikit-image>=0.22          # tested 0.26.0 - PSNR/SSIM, HOG, watershed
+ultralytics>=8.3            # tested 8.4.191 - YOLO; installs torch + torchvision (CPU build from PyPI on Windows)
+
+# Supporting libraries
+scipy>=1.11                 # tested 1.17.1 - hole filling, labelling
+pillow>=10                  # tested 13.0.0 - GIF writing
+
+# Report generation and tests
+python-docx>=1.1            # tested 1.2.0 - tools/build_report.py
+pytest>=8                   # tested 9.1.1
+pywin32>=306; sys_platform == "win32"   # optional - tools/export_pdf.py drives Microsoft Word to make the PDF

@@ -1,0 +1,32 @@
+# Python environment and caches
+.venv/
+venv/
+.tools/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Downloaded model weights and Ultralytics settings (downloaded again automatically)
+models/
+*.pt
+
+# Personal input media is kept OUT of Git by default (privacy).
+# Upload the original photo and video to Google Drive instead, or remove these
+# lines only if you have decided to publish them.
+inputs/*
+!inputs/README.md
+
+# Large generated videos (the GIF preview and still frames are kept)
+outputs/**/*.mp4
+outputs/**/*.avi
+
+# Office temporary files and archives
+reports/~$*
+*.zip
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

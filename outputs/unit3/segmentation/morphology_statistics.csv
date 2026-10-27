@@ -1,0 +1,6 @@
+operation,foreground_pct,blobs,small_blobs_lt_50px,holes
+Binary mask (Otsu),35.833468505001356,37,26,30
+Erosion,33.74902596886281,22,10,4
+Dilation,38.084124485154966,14,0,12
+Opening,35.52355962660815,9,0,8
+Closing,36.019909991571645,25,16,4

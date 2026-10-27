@@ -1,0 +1,2 @@
+experiment,image2_size,keypoints_1,keypoints_2,ratio_test_matches,match_ratio_pct,ransac_model,ransac_inliers,inlier_ratio_pct,matcher,detect_ms,match_ms,correct_matches_pct,median_position_error_px,pair_type
+PRELIMINARY: original vs synthetic tilted/relit copy,1233x1275,545,238,172,72.26890756302521,homography,154,89.53488372093024,bf,147.74059999763267,17.97950000036508,86.04651162790698,0.3343266248703003,preliminary synthetic substitute (NOT a second photograph)

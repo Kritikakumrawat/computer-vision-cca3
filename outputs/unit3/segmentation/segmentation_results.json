@@ -1,0 +1,161 @@
+{
+  "task": "Unit 3B - Morphology and segmentation",
+  "status": "completed",
+  "input": "original_photo.jpg",
+  "parameters": {
+    "blur_kernel": 5,
+    "adaptive_block_size": 31,
+    "adaptive_c": 5,
+    "morph_kernel_size": 9,
+    "morph_kernel_shape": "ellipse",
+    "canny_low": 50,
+    "canny_high": 150,
+    "canny_auto_sigma": 0.33,
+    "watershed_max_side": 800,
+    "watershed_min_distance_fraction": 0.04,
+    "watershed_min_object_fraction": 0.0005,
+    "watershed_background_kernel_fraction": 0.25,
+    "portrait_border_fraction": 0.02,
+    "portrait_bg_distance": 12.0,
+    "portrait_fg_distance": 40.0,
+    "zoom_box": [
+      0.3,
+      0.02,
+      0.7,
+      0.4
+    ]
+  },
+  "otsu_threshold": 102.0,
+  "morphology": [
+    {
+      "operation": "Binary mask (Otsu)",
+      "foreground_pct": 35.833468505001356,
+      "blobs": 37,
+      "small_blobs_lt_50px": 26,
+      "holes": 30
+    },
+    {
+      "operation": "Erosion",
+      "foreground_pct": 33.74902596886281,
+      "blobs": 22,
+      "small_blobs_lt_50px": 10,
+      "holes": 4
+    },
+    {
+      "operation": "Dilation",
+      "foreground_pct": 38.084124485154966,
+      "blobs": 14,
+      "small_blobs_lt_50px": 0,
+      "holes": 12
+    },
+    {
+      "operation": "Opening",
+      "foreground_pct": 35.52355962660815,
+      "blobs": 9,
+      "small_blobs_lt_50px": 0,
+      "holes": 8
+    },
+    {
+      "operation": "Closing",
+      "foreground_pct": 36.019909991571645,
+      "blobs": 25,
+      "small_blobs_lt_50px": 16,
+      "holes": 4
+    }
+  ],
+  "canny": [
+    {
+      "input": "Clean grayscale",
+      "low": 50,
+      "high": 150,
+      "edge_pixels_pct": 0.5640952244644817
+    },
+    {
+      "input": "Clean grayscale (automatic thresholds)",
+      "low": 107,
+      "high": 214,
+      "edge_pixels_pct": 0.3740915668781706
+    },
+    {
+      "input": "Gaussian-noisy grayscale",
+      "low": 50,
+      "high": 150,
+      "edge_pixels_pct": 0.7545441534277945
+    },
+    {
+      "input": "Gaussian-noisy after 5x5 median filter",
+      "low": 50,
+      "high": 150,
+      "edge_pixels_pct": 0.4414547651988614
+    }
+  ],
+  "watershed_objects": {
+    "source": "scikit-image sample 'coins'",
+    "description": "SUPPLEMENTARY EXAMPLE (not the student's photograph): scikit-image's bundled 'coins' image (Greek coins from Pompeii, Brooklyn Museum collection, no known copyright restrictions), used because the portrait does not contain multiple touching objects.",
+    "uses_student_photo": false,
+    "image_size": [
+      384,
+      303
+    ],
+    "objects_bright": true,
+    "background_kernel_fraction": 0.25,
+    "otsu_value": 60.0,
+    "connected_components": 22,
+    "markers_found": 24,
+    "watershed_regions": 24,
+    "min_distance_px": 12,
+    "region_area_min": 828,
+    "region_area_max": 3146,
+    "region_area_median": 1477.5
+  },
+  "watershed_synthetic_touching_discs": {
+    "description": "Computer-generated teaching image (three overlapping discs), not a photograph.",
+    "objects_bright": true,
+    "background_kernel_fraction": 0,
+    "otsu_value": 123.0,
+    "connected_components": 1,
+    "markers_found": 3,
+    "watershed_regions": 3,
+    "min_distance_px": 24,
+    "region_area_min": 5484,
+    "region_area_max": 11007,
+    "region_area_median": 7607.0
+  },
+  "watershed_portrait": {
+    "background_lab": [
+      178.0,
+      128.0,
+      123.0
+    ],
+    "sure_bg_pct": 39.12949445796161,
+    "sure_fg_pct": 38.733839034397214,
+    "person_pct": 45.01000270343336,
+    "large_person_regions": 1
+  },
+  "files": [
+    "unit3/segmentation/01_grayscale.png",
+    "unit3/segmentation/02_binary_otsu.png",
+    "unit3/segmentation/03_binary_adaptive.png",
+    "unit3/segmentation/fig_thresholding.png",
+    "unit3/segmentation/04_erosion.png",
+    "unit3/segmentation/05_dilation.png",
+    "unit3/segmentation/06_opening.png",
+    "unit3/segmentation/07_closing.png",
+    "unit3/segmentation/morphology_statistics.csv",
+    "unit3/segmentation/fig_morphology.png",
+    "unit3/segmentation/08_canny_edges.png",
+    "unit3/segmentation/09_canny_auto_thresholds.png",
+    "unit3/segmentation/10_canny_on_gaussian_noisy.png",
+    "unit3/segmentation/11_canny_on_median_restored.png",
+    "unit3/segmentation/canny_statistics.csv",
+    "unit3/segmentation/fig_canny.png",
+    "unit3/segmentation/12_watershed_input.png",
+    "unit3/segmentation/13_watershed_objects_result.png",
+    "unit3/segmentation/fig_watershed_objects.png",
+    "unit3/segmentation/16_SYNTHETIC_touching_discs_watershed.png",
+    "unit3/segmentation/fig_watershed_touching_synthetic.png",
+    "unit3/segmentation/14_portrait_watershed_mask.png",
+    "unit3/segmentation/15_portrait_watershed_overlay.jpg",
+    "unit3/segmentation/fig_watershed_portrait.png"
+  ]
+}

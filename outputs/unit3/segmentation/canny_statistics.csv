@@ -1,0 +1,5 @@
+input,low,high,edge_pixels_pct
+Clean grayscale,50,150,0.5640952244644817
+Clean grayscale (automatic thresholds),107,214,0.3740915668781706
+Gaussian-noisy grayscale,50,150,0.7545441534277945
+Gaussian-noisy after 5x5 median filter,50,150,0.4414547651988614

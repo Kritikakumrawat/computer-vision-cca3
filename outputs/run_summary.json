@@ -1,0 +1,52 @@
+{
+  "inputs": {
+    "original_photo": "original_photo.jpg",
+    "second_photo": null,
+    "original_video": null,
+    "watershed_photo": null
+  },
+  "tasks": {
+    "3A": {
+      "task": "3A",
+      "name": "Image restoration",
+      "status": "completed",
+      "pending": [],
+      "run_at": "2026-10-28T00:16:43"
+    },
+    "3B": {
+      "task": "3B",
+      "name": "Morphology and segmentation",
+      "status": "completed",
+      "pending": [],
+      "run_at": "2026-10-28T00:16:43"
+    },
+    "4": {
+      "task": "4",
+      "name": "HOG and SIFT feature matching",
+      "status": "partial",
+      "pending": [
+        "Original vs second photograph matching (inputs/second_photo.jpg not supplied)",
+        "Rotation/resizing of the second photograph (needs inputs/second_photo.jpg)"
+      ],
+      "run_at": "2026-10-28T00:16:43"
+    },
+    "5A": {
+      "task": "5A",
+      "name": "Haar cascade and YOLO detection",
+      "status": "partial",
+      "pending": [
+        "Haar/YOLO on frames of the self-recorded video (inputs/original_video.mp4 not supplied)"
+      ],
+      "run_at": "2026-10-28T00:16:43"
+    },
+    "5B": {
+      "task": "5B",
+      "name": "Video motion estimation",
+      "status": "pending",
+      "pending": [
+        "Missing input 'original_video': copy your file into D:\\StudentComputerVisionAssignment\\inputs and name it original_video.mp4 or original_video.mov or original_video.avi or original_video.mkv."
+      ],
+      "run_at": "2026-10-28T00:16:43"
+    }
+  }
+}

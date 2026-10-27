@@ -1,0 +1,262 @@
+{
+  "task": "Unit 3A - Image restoration",
+  "status": "completed",
+  "input": {
+    "file": "original_photo.jpg",
+    "width": 1233,
+    "height": 1275,
+    "channels": 3
+  },
+  "parameters": {
+    "gaussian_noise_sigma": 25.0,
+    "salt_pepper_amount": 0.05,
+    "salt_vs_pepper": 0.5,
+    "kernel_sizes": [
+      3,
+      5,
+      7,
+      9,
+      11
+    ],
+    "default_kernel": 5,
+    "zoom_box": [
+      0.36,
+      0.2,
+      0.64,
+      0.42
+    ],
+    "random_seed": 42
+  },
+  "metrics": [
+    {
+      "noise": "Gaussian noise",
+      "method": "Noisy (no filter)",
+      "kernel": null,
+      "psnr_db": 20.443836446844873,
+      "ssim": 0.1305284059858153,
+      "time_ms": 0.0
+    },
+    {
+      "noise": "Gaussian noise",
+      "method": "Gaussian filter",
+      "kernel": 3,
+      "psnr_db": 28.86882413834149,
+      "ssim": 0.49698503217145457,
+      "time_ms": 29.066399998555426
+    },
+    {
+      "noise": "Gaussian noise",
+      "method": "Gaussian filter",
+      "kernel": 5,
+      "psnr_db": 31.40060598451342,
+      "ssim": 0.6606720371952955,
+      "time_ms": 4.882400004134979
+    },
+    {
+      "noise": "Gaussian noise",
+      "method": "Gaussian filter",
+      "kernel": 7,
+      "psnr_db": 33.44075176214873,
+      "ssim": 0.7950024764850943,
+      "time_ms": 3.9443999994546175
+    },
+    {
+      "noise": "Gaussian noise",
+      "method": "Gaussian filter",
+      "kernel": 9,
+      "psnr_db": 34.2103546297331,
+      "ssim": 0.852029341962797,
+      "time_ms": 2.212499995948747
+    },
+    {
+      "noise": "Gaussian noise",
+      "method": "Gaussian filter",
+      "kernel": 11,
+      "psnr_db": 34.522379932580975,
+      "ssim": 0.8884043874057723,
+      "time_ms": 2.229300000180956
+    },
+    {
+      "noise": "Gaussian noise",
+      "method": "Median filter",
+      "kernel": 3,
+      "psnr_db": 27.8879428885574,
+      "ssim": 0.4464024241809095,
+      "time_ms": 3.6804999981541187
+    },
+    {
+      "noise": "Gaussian noise",
+      "method": "Median filter",
+      "kernel": 5,
+      "psnr_db": 31.747540352929164,
+      "ssim": 0.700716577213495,
+      "time_ms": 7.099599999492057
+    },
+    {
+      "noise": "Gaussian noise",
+      "method": "Median filter",
+      "kernel": 7,
+      "psnr_db": 33.65058266341579,
+      "ssim": 0.8269331331405271,
+      "time_ms": 155.223500005377
+    },
+    {
+      "noise": "Gaussian noise",
+      "method": "Median filter",
+      "kernel": 9,
+      "psnr_db": 34.37349778995433,
+      "ssim": 0.882416132446813,
+      "time_ms": 158.3704000004218
+    },
+    {
+      "noise": "Gaussian noise",
+      "method": "Median filter",
+      "kernel": 11,
+      "psnr_db": 34.418678372635206,
+      "ssim": 0.907162506837787,
+      "time_ms": 161.70170000259532
+    },
+    {
+      "noise": "Salt-and-pepper noise",
+      "method": "Noisy (no filter)",
+      "kernel": null,
+      "psnr_db": 17.980334737475076,
+      "ssim": 0.22338080640587735,
+      "time_ms": 0.0
+    },
+    {
+      "noise": "Salt-and-pepper noise",
+      "method": "Gaussian filter",
+      "kernel": 3,
+      "psnr_db": 26.179513195443484,
+      "ssim": 0.45098315586249216,
+      "time_ms": 1.7268000010517426
+    },
+    {
+      "noise": "Salt-and-pepper noise",
+      "method": "Gaussian filter",
+      "kernel": 5,
+      "psnr_db": 28.54643730365889,
+      "ssim": 0.5825781827172304,
+      "time_ms": 3.0996999994385988
+    },
+    {
+      "noise": "Salt-and-pepper noise",
+      "method": "Gaussian filter",
+      "kernel": 7,
+      "psnr_db": 30.466096868438957,
+      "ssim": 0.7185486218499251,
+      "time_ms": 1.5589000031468458
+    },
+    {
+      "noise": "Salt-and-pepper noise",
+      "method": "Gaussian filter",
+      "kernel": 9,
+      "psnr_db": 31.274966188756824,
+      "ssim": 0.7885938399055927,
+      "time_ms": 2.3185000027297065
+    },
+    {
+      "noise": "Salt-and-pepper noise",
+      "method": "Gaussian filter",
+      "kernel": 11,
+      "psnr_db": 31.730907633741786,
+      "ssim": 0.8389516416030328,
+      "time_ms": 2.0814000017708167
+    },
+    {
+      "noise": "Salt-and-pepper noise",
+      "method": "Median filter",
+      "kernel": 3,
+      "psnr_db": 47.42671050217496,
+      "ssim": 0.9949445544035177,
+      "time_ms": 1.593100001628045
+    },
+    {
+      "noise": "Salt-and-pepper noise",
+      "method": "Median filter",
+      "kernel": 5,
+      "psnr_db": 44.03285181201565,
+      "ssim": 0.9872199163467618,
+      "time_ms": 6.347799993818626
+    },
+    {
+      "noise": "Salt-and-pepper noise",
+      "method": "Median filter",
+      "kernel": 7,
+      "psnr_db": 41.43093328548295,
+      "ssim": 0.9779875950676501,
+      "time_ms": 115.2972000054433
+    },
+    {
+      "noise": "Salt-and-pepper noise",
+      "method": "Median filter",
+      "kernel": 9,
+      "psnr_db": 39.72018086239356,
+      "ssim": 0.9700213810614473,
+      "time_ms": 134.52809999580495
+    },
+    {
+      "noise": "Salt-and-pepper noise",
+      "method": "Median filter",
+      "kernel": 11,
+      "psnr_db": 38.4074008892675,
+      "ssim": 0.9639670763688112,
+      "time_ms": 128.15899999986868
+    }
+  ],
+  "best": {
+    "Gaussian noise": {
+      "by_psnr": {
+        "noise": "Gaussian noise",
+        "method": "Gaussian filter",
+        "kernel": 11,
+        "psnr_db": 34.522379932580975,
+        "ssim": 0.8884043874057723,
+        "time_ms": 2.229300000180956
+      },
+      "by_ssim": {
+        "noise": "Gaussian noise",
+        "method": "Median filter",
+        "kernel": 11,
+        "psnr_db": 34.418678372635206,
+        "ssim": 0.907162506837787,
+        "time_ms": 161.70170000259532
+      }
+    },
+    "Salt-and-pepper noise": {
+      "by_psnr": {
+        "noise": "Salt-and-pepper noise",
+        "method": "Median filter",
+        "kernel": 3,
+        "psnr_db": 47.42671050217496,
+        "ssim": 0.9949445544035177,
+        "time_ms": 1.593100001628045
+      },
+      "by_ssim": {
+        "noise": "Salt-and-pepper noise",
+        "method": "Median filter",
+        "kernel": 3,
+        "psnr_db": 47.42671050217496,
+        "ssim": 0.9949445544035177,
+        "time_ms": 1.593100001628045
+      }
+    }
+  },
+  "default_kernel": 5,
+  "files": [
+    "unit3/restoration/01_original_display.png",
+    "unit3/restoration/02_noisy_gaussian_sigma25.png",
+    "unit3/restoration/03_noisy_salt_pepper_5pct.png",
+    "unit3/restoration/04_gaussian_noise_gaussian_filter_k5.png",
+    "unit3/restoration/05_gaussian_noise_median_filter_k5.png",
+    "unit3/restoration/06_salt_pepper_gaussian_filter_k5.png",
+    "unit3/restoration/07_salt_pepper_median_filter_k5.png",
+    "unit3/restoration/fig_gaussian_noise_comparison.png",
+    "unit3/restoration/fig_salt_pepper_comparison.png",
+    "unit3/restoration/fig_zoomed_face_comparison.png",
+    "unit3/restoration/fig_kernel_size_tradeoff.png",
+    "unit3/restoration/fig_psnr_ssim_vs_kernel.png",
+    "unit3/restoration/restoration_metrics.csv"
+  ]
+}

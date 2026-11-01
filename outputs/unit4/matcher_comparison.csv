@@ -1,3 +1,3 @@
-experiment,image2_size,keypoints_1,keypoints_2,ratio_test_matches,match_ratio_pct,ransac_model,ransac_inliers,inlier_ratio_pct,matcher,detect_ms,match_ms,correct_matches_pct,median_position_error_px
-PRELIMINARY synthetic view,1233x1275,545,238,172,72.26890756302521,homography,154,89.53488372093024,"Brute force (BFMatcher, L2)",132.20729999738978,0.9727999931783415,86.04651162790698,0.3343266248703003
-PRELIMINARY synthetic view,1233x1275,545,238,175,73.52941176470588,homography,154,88.0,"FLANN (KD-tree, 5 trees, 50 checks)",141.30170000134967,29.056200000923127,84.57142857142857,0.3428110182285309
+experiment,image2_size,keypoints_1,keypoints_2,ratio_test_matches,match_ratio_pct,ransac_model,ransac_inliers,inlier_ratio_pct,matcher,detect_ms,match_ms
+Original vs second photo,463x609,545,1677,19,3.4862385321100917,fundamental,9,47.36842105263158,"Brute force (BFMatcher, L2)",36.06020000006538,3.9557999989483505
+Original vs second photo,463x609,545,1677,20,3.669724770642202,fundamental,10,50.0,"FLANN (KD-tree, 5 trees, 50 checks)",34.57269999489654,17.798200002289377

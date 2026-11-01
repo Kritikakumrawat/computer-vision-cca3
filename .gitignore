@@ -21,8 +21,28 @@ inputs/*
 outputs/**/*.mp4
 outputs/**/*.avi
 
+# Secrets and environment files (none are used by this project; kept out just in case)
+.env
+.env.*
+*.key
+*.pem
+credentials*.json
+
+# Node.js folders (not used, but never upload them)
+node_modules/
+
+# Temporary and log files
+*.tmp
+*.temp
+*.log
+*.bak
+*~
+.coverage
+htmlcov/
+
 # Office temporary files and archives
 reports/~$*
+~$*
 *.zip
 
 # Editors / OS

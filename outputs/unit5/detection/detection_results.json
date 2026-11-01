@@ -1,6 +1,6 @@
 {
   "task": "Unit 5A - Haar cascade and YOLO detection",
-  "status": "partial",
+  "status": "completed",
   "input": "original_photo.jpg",
   "haar": {
     "faces": 1,
@@ -27,7 +27,7 @@
         71
       ]
     ],
-    "time_ms": 21.370000002207235,
+    "time_ms": 20.10919999156613,
     "parameters": {
       "scale_factor": 1.1,
       "min_neighbors": 5,
@@ -48,7 +48,7 @@
         ]
       }
     ],
-    "time_ms": 62.46669999381993,
+    "time_ms": 60.21459998737555,
     "confidence_threshold": 0.25
   },
   "yolo_error": null,
@@ -116,7 +116,66 @@
       "yolo_other_labels": ""
     }
   ],
-  "video_frames": [],
+  "video_frames": [
+    {
+      "frame_index": 295,
+      "time_s": 4.9,
+      "haar_faces": 0,
+      "haar_eyes": 0,
+      "yolo_detections": "person 0.91, bed 0.86"
+    },
+    {
+      "frame_index": 739,
+      "time_s": 12.3,
+      "haar_faces": 0,
+      "haar_eyes": 0,
+      "yolo_detections": "bed 0.74"
+    },
+    {
+      "frame_index": 1183,
+      "time_s": 19.7,
+      "haar_faces": 0,
+      "haar_eyes": 0,
+      "yolo_detections": "person 0.86, bed 0.36"
+    }
+  ],
+  "front_camera_frames": [
+    {
+      "frame_index": 1054,
+      "time_s": 35.1,
+      "haar_faces": 1,
+      "haar_eyes": 4,
+      "yolo_detections": "person 0.94"
+    },
+    {
+      "frame_index": 3163,
+      "time_s": 105.4,
+      "haar_faces": 1,
+      "haar_eyes": 5,
+      "yolo_detections": "person 0.93"
+    },
+    {
+      "frame_index": 5272,
+      "time_s": 175.7,
+      "haar_faces": 2,
+      "haar_eyes": 2,
+      "yolo_detections": "person 0.95"
+    },
+    {
+      "frame_index": 7380,
+      "time_s": 246.0,
+      "haar_faces": 2,
+      "haar_eyes": 3,
+      "yolo_detections": "person 0.95"
+    },
+    {
+      "frame_index": 9489,
+      "time_s": 316.3,
+      "haar_faces": 1,
+      "haar_eyes": 4,
+      "yolo_detections": "person 0.92"
+    }
+  ],
   "comparison": [
     {
       "aspect": "What it detects",
@@ -135,8 +194,8 @@
     },
     {
       "aspect": "Time on this CPU (portrait)",
-      "haar": "21 ms (face cascade)",
-      "yolo": "62 ms (after warm-up)"
+      "haar": "20 ms (face cascade)",
+      "yolo": "60 ms (after warm-up)"
     },
     {
       "aspect": "Model size / training",
@@ -150,11 +209,12 @@
     "Missed detection: the Haar cascade found 0 face(s) in the portrait rotated by 30 degrees, although the face is fully visible.",
     "Missed detection: the Haar cascade found 0 face(s) in the portrait rotated by 45 degrees, although the face is fully visible.",
     "Missed detection: the Haar cascade found 0 face(s) in the portrait rotated by 90 degrees, although the face is fully visible.",
-    "Duplicate/false detection: YOLO returned 2 person boxes in the portrait rotated by 90 degrees (one person present)."
+    "Duplicate/false detection: YOLO returned 2 person boxes in the portrait rotated by 90 degrees (one person present).",
+    "Extra detection: the Haar cascade returned 2 face boxes in front-camera frame 5272 (175.7 s), which shows one face.",
+    "Extra detection: the Haar cascade returned 2 face boxes in front-camera frame 7380 (246.0 s), which shows one face.",
+    "Incorrect eye detections: in 3 of 5 front-camera frames the eye cascade returned more than two eye boxes per face (up to 5 in one frame); the extra boxes fall on other dark facial features such as the nostrils or mouth."
   ],
-  "pending": [
-    "Haar/YOLO on frames of the self-recorded video (inputs/original_video.mp4 not supplied)"
-  ],
+  "pending": [],
   "files": [
     "unit5/detection/01_haar_faces_portrait.jpg",
     "unit5/detection/02_yolo_portrait.jpg",
@@ -163,6 +223,18 @@
     "unit5/detection/fig_haar_min_neighbors.png",
     "unit5/detection/rotation_robustness.csv",
     "unit5/detection/fig_rotation_robustness.png",
+    "unit5/detection/10_video_frame_00295_detections.jpg",
+    "unit5/detection/10_video_frame_00739_detections.jpg",
+    "unit5/detection/10_video_frame_01183_detections.jpg",
+    "unit5/detection/fig_video_frame_detections.png",
+    "unit5/detection/video_frame_detections.csv",
+    "unit5/detection/11_front_camera_frame_01054_detections.jpg",
+    "unit5/detection/11_front_camera_frame_03163_detections.jpg",
+    "unit5/detection/11_front_camera_frame_05272_detections.jpg",
+    "unit5/detection/11_front_camera_frame_07380_detections.jpg",
+    "unit5/detection/11_front_camera_frame_09489_detections.jpg",
+    "unit5/detection/fig_front_camera_detections.png",
+    "unit5/detection/front_camera_frame_detections.csv",
     "unit5/detection/haar_vs_yolo_comparison.csv"
   ]
 }

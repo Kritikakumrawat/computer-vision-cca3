@@ -1,68 +1,74 @@
 # Submission checklist
 
-The assignment asks for: original photo, original video, source code pushed to
-Git, the Git URL in the report, the full report with tables and measurements, the
-explanation video, and any files needed to run the code. Access must be given to
-the instructor at **rahul.inchal.inchal24@gmail.com** and
-**rahul.inchal.vf@mitwpu.edu.in** (as stated in the assignment PDF).
+Student: Kritika Kumrawat · PRN 1272251096 · MCA E · Instructor: Rahul Inchal · Submission: 3 November 2026  
+Repository: https://github.com/Kritikakumrawat/computer-vision-cca3 (branch `main`)  
+Explanation video: https://drive.google.com/file/d/1KC3AiaGDgUWXWRE5pkoV7XZHZk3L9u9n/view?usp=drivesdk
 
-## 1. Finish the inputs and results
-- [ ] Add `inputs/second_photo.jpg` (same subject, your own camera) and
-      `inputs/original_video.mp4` (15–30 s, self-recorded) – see `inputs/README.md`.
-- [ ] `python main.py --all` – no task should say FAILED.
-- [ ] `python -m pytest` – all tests pass.
-- [ ] Look at the new figures in `outputs/unit4` and `outputs/unit5/motion` and
-      write your observations into the highlighted placeholder in Section 7.2 of the report.
+The assignment asks for: original photograph, original self-recorded video,
+source code pushed to Git, the Git URL in the report, the full report with
+tables and measurements, the explanation video, and any files needed to run the
+code. Access must be given to the instructor at
+**rahul.inchal.inchal24@gmail.com** and **rahul.inchal.vf@mitwpu.edu.in**
+(as stated in the assignment PDF).
 
-## 2. Git repository (private, then invite the instructor)
-
-The local repository is already initialised with one commit (see `git log`).
-Personal media in `inputs/`, the virtual environment, YOLO weights and the large
-output video are excluded by `.gitignore`. The figures in `outputs/` show your
-portrait, so keep the repository **private**.
-
-1. On github.com: **New repository** → name e.g. `CCA3-Computer-Vision` →
-   **Private** → do *not* add a README/.gitignore (the project has them) → Create.
-2. In PowerShell, in the project folder:
+## 1. Inputs and results
+- [x] `inputs/original_photo.jpg` – portrait.
+- [x] `inputs/original_video.mp4` – 24.7 s self-recorded walking clip (Unit 5B, Unit 5A frames).
+- [x] `inputs/front_camera_video.mp4` – self-recorded front-camera clip (Unit 5A face frames, optional).
+- [x] `inputs/second_photo.png` – second photograph (Unit 4); `inputs/second_photo_b.png` – same-scene photo (extra pair).
+- [x] `python main.py --all`, `python -m pytest`, `python tools/capture_screenshots.py`.
+- After changing any input, run in the project folder:
 
 ```
+.venv\Scripts\python.exe main.py --all
+.venv\Scripts\python.exe tools\capture_screenshots.py
+.venv\Scripts\python.exe tools\build_report.py
+.venv\Scripts\python.exe tools\export_pdf.py
+```
+
+## 2. Upload to GitHub (Command Prompt, `cmd.exe`)
+
+`.gitignore` keeps out the personal media in `inputs/`, the virtual
+environment, YOLO weights, the large output MP4, caches, `.env`/secret files,
+`node_modules/` and temporary files. The report and output figures show the
+student's face: the repository is currently **public**, so make it private on
+GitHub (Settings → General → Danger Zone → Change visibility) if you do not want
+them public, and invite the instructor as a collaborator.
+
+```
+cd /d D:\StudentComputerVisionAssignment
+git config user.name "Kritika Kumrawat"
+git config user.email "YOUR_GITHUB_EMAIL"
+git checkout --orphan final-main
 git add -A
-git commit -m "Add second photo and video results"     # only if you changed something
-git remote add origin https://github.com/<your-username>/CCA3-Computer-Vision.git
-git branch -M main
+git commit -m "CCA 3 computer vision assignment: Units 3, 4 and 5"
+git branch -D main
+git branch -m main
+git remote add origin https://github.com/Kritikakumrawat/computer-vision-cca3.git
 git push -u origin main
 ```
 
-   The first push opens a browser window to sign in to GitHub (Git Credential Manager).
-3. Repository → **Settings → Collaborators → Add people** → invite the instructor
-   (GitHub accepts an e-mail address or a GitHub username).
-4. Copy the repository URL into the report (Section 10, *Git repository URL*).
-
-If the instructor needs a public repository instead, decide first whether you are
-comfortable publishing figures that show your face.
+The `--orphan` steps replace the earlier local commit (authored under another
+name) with one clean commit authored by you; nothing in the files changes. The
+first push opens a browser window to sign in to GitHub. Afterwards:
+Repository → **Settings → Collaborators → Add people** → invite the instructor.
 
 ## 3. Report
-- [ ] `python tools/build_report.py` then `python tools/export_pdf.py`.
-- [ ] Open `reports/CCA3_Technical_Report.docx` in Word, fill in the yellow fields
-      (name, PRN, programme, instructor, date, Git URL, video link, video
-      description, motion observations), remove the highlighting, update the table
-      of contents (right-click → Update Field) and save as PDF again.
-      (Re-running `build_report.py` overwrites manual edits, so do this last.)
+- [x] Student name, PRN, programme, instructor, date and repository URL are filled in.
+- [x] Explanation-video link added (Section 11).
 
-## 4. Explanation video
-- [ ] Record 5–8 minutes in your own words following `docs/VIDEO_SCRIPT.md`.
-- [ ] Upload to the instructor's Google Drive folder and paste the link into the report.
+## 4. Explanation video (5–8 minutes)
+- [x] Uploaded to Google Drive; link in the report and README.
+- [ ] Make sure the Drive file is shared with the instructor (open the link in a private window to check).
 
 ## 5. Google Drive upload
-Upload to the Drive folder provided by the instructor and share it with both
-addresses above:
-- [ ] `inputs/original_photo.jpg`, `inputs/second_photo.jpg`, `inputs/original_video.mp4`
+Share the folder with both instructor addresses above:
+- [ ] `inputs/original_photo.jpg`, `inputs/second_photo.png`, `inputs/original_video.mp4`
 - [ ] `reports/CCA3_Technical_Report.pdf` (and the .docx)
-- [ ] `StudentComputerVisionAssignment.zip` (code, outputs, docs – personal inputs not included)
+- [ ] `StudentComputerVisionAssignment.zip` (code, inputs, outputs, screenshots, docs, reports)
 - [ ] The explanation video
 
 ## 6. Final check
-- [ ] Repository opens for the instructor (test with a private/incognito window
-      after they accept, or ask them).
+- [ ] Repository opens for the instructor.
 - [ ] Drive link works for the instructor.
-- [ ] Report contains both links and no remaining "PENDING" items you could complete.
+- [ ] Report has no remaining "PENDING" items you could complete.

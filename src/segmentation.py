@@ -289,10 +289,10 @@ def run(paths: utils.ProjectPaths, options: dict | None = None) -> dict:
         ax.axis("off")
     axes[1].set_box_aspect(gray.shape[0] / gray.shape[1])
     fig.suptitle("Binary thresholding of the portrait", fontweight="bold")
-    fig.text(0.5, -0.02, "Otsu uses one global threshold chosen from the histogram; adaptive thresholding compares\n"
+    fig.text(0.5, 0.005, "Otsu uses one global threshold chosen from the histogram; adaptive thresholding compares\n"
              "each pixel with its neighbourhood and therefore keeps texture and edges instead of large regions.",
-             ha="center", fontsize=8.5, color=utils.INK_SECONDARY)
-    fig.tight_layout()
+             ha="center", va="bottom", fontsize=8.5, color=utils.INK_SECONDARY)
+    fig.tight_layout(rect=(0, 0.05, 1, 0.97))
     keep(utils.finish_figure(fig, out_dir / "fig_thresholding.png"))
 
     # --- Morphology on the Otsu mask

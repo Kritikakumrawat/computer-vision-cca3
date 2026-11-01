@@ -208,6 +208,7 @@ def process_video(video_path: Path, out_dir: Path, params: dict, output_dir_root
     gif_end = gif_start + int(params["gif_seconds"] * fps)
 
     rows, snapshots, consecutive, gif_frames = [], {}, {}, []
+    peak_value, peak_index, peak_snapshot = -1.0, None, None
     writer = None
     video_out = out_dir / "motion_side_by_side.mp4"
     prev_gray = prev_points = None
@@ -273,10 +274,14 @@ def process_video(video_path: Path, out_dir: Path, params: dict, output_dir_root
         writer.write(mosaic)
         if gif_start <= index < gif_end and index % 2 == 0:
             gif_frames.append(mosaic)
-        if index in snapshot_indices:
-            snapshots[index] = {"frame": frame.copy(), "diff": diff_mask, "gmm": gmm_mask, "raw_gmm": raw_gmm,
-                                "flow": flow_view, "diff_boxes": draw_boxes(frame, diff_boxes, (40, 40, 230)),
-                                "row": rows[-1]}
+        is_peak = rows[-1]["diff_foreground_pct"] > peak_value and index not in snapshot_indices
+        if index in snapshot_indices or is_peak:
+            snap = {"frame": frame.copy(), "diff": diff_mask, "gmm": gmm_mask, "raw_gmm": raw_gmm,
+                    "flow": flow_view, "diff_boxes": draw_boxes(frame, diff_boxes, (40, 40, 230)), "row": rows[-1]}
+            if is_peak:  # frame with the most frame-differencing motion so far
+                peak_value, peak_index, peak_snapshot = rows[-1]["diff_foreground_pct"], index, snap
+            else:
+                snapshots[index] = snap
         prev_gray = gray
         prev_points = new.reshape(-1, 1, 2).astype(np.float32) if len(new) else None
 
@@ -285,6 +290,10 @@ def process_video(video_path: Path, out_dir: Path, params: dict, output_dir_root
         keep(video_out)
     if not rows:
         raise ValueError("No consecutive frame pairs could be processed.")
+    # Besides the evenly spaced snapshots, keep the frame with the strongest motion.
+    if peak_snapshot is not None:
+        snapshots[peak_index] = peak_snapshot
+    snapshots = dict(sorted(snapshots.items()))
 
     # --- Saved frames and masks
     for index, frame in sorted(consecutive.items()):
@@ -313,7 +322,8 @@ def process_video(video_path: Path, out_dir: Path, params: dict, output_dir_root
         for index, snap in snapshots.items():
             r = snap["row"]
             images += [snap["diff_boxes"], snap["diff"], snap["gmm"], snap["flow"]]
-            titles += [f"Frame {index} ({index / fps:.1f} s), red = diff regions",
+            label = "peak motion" if index == peak_index else "red = diff regions"
+            titles += [f"Frame {index} ({index / fps:.1f} s), {label}",
                        f"Frame differencing: {r['diff_foreground_pct']:.1f}% moving",
                        f"MOG2 foreground: {r['gmm_foreground_pct']:.1f}%",
                        f"Lucas-Kanade: {r['lk_moving_points']}/{r['lk_tracked_points']} points moving"]
@@ -383,7 +393,8 @@ def process_video(video_path: Path, out_dir: Path, params: dict, output_dir_root
         "video": info,
         "processed_frames": len(rows) + 1,
         "processed_size": f"{frame_size[1]}x{frame_size[0]}" if frame_size else None,
-        "snapshot_frames": snapshot_indices,
+        "snapshot_frames": sorted(snapshots),
+        "peak_motion_frame": peak_index,
         "summary": summary,
         "mean_mask_iou": mean("mask_iou"),
         "mean_lk_moving_in_gmm_pct": mean("lk_moving_in_gmm_pct"),

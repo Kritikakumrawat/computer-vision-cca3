@@ -20,7 +20,15 @@ DEFAULT_MODELS_DIR = PROJECT_ROOT / "models"
 INPUT_FILES = {
     "original_photo": ("original_photo", (".jpg", ".jpeg", ".png")),
     "second_photo": ("second_photo", (".jpg", ".jpeg", ".png")),
+    # Optional: another photo taken in the same scene as second_photo (extra same-scene matching pair)
+    "second_photo_b": ("second_photo_b", (".jpg", ".jpeg", ".png")),
     "original_video": ("original_video", (".mp4", ".mov", ".avi", ".mkv")),
+    # Fallback for Unit 4 when no second photograph exists: a frame extracted from the
+    # student's own video by tools/extract_video_frame.py (always labelled as a video frame).
+    "second_image_video_frame": ("second_image_video_frame", (".jpg", ".png")),
+    # Optional: a self-recorded front-camera (selfie) clip; its frames are used only
+    # for Haar/YOLO face detection in Unit 5A (frontal faces).
+    "front_camera_video": ("front_camera_video", (".mp4", ".mov", ".avi", ".mkv")),
     # Optional: your own photo of several touching objects (coins, fruit, ...)
     # for watershed. If it is missing, a documented scikit-image sample is used.
     "watershed_photo": ("watershed_photo", (".jpg", ".jpeg", ".png")),
@@ -94,7 +102,22 @@ DETECTION = {
     "portrait_expected_faces": 1,
     "portrait_expected_persons": 1,
     "video_frame_fractions": [0.2, 0.5, 0.8],  # frames sampled for detection
+    "face_video_frame_fractions": [0.1, 0.3, 0.5, 0.7, 0.9],  # frames sampled from the front-camera video
 }
+
+# Figures that `python main.py --screenshots` shows on screen and captures as
+# screenshot_<name>.jpg (genuine screenshots of the running program, Windows only).
+SCREENSHOT_FIGURES = [
+    # Unit 3
+    "01_original_display", "fig_gaussian_noise_comparison", "fig_salt_pepper_comparison",
+    "fig_zoomed_face_comparison", "fig_thresholding", "fig_morphology", "fig_canny",
+    "fig_watershed_objects", "fig_watershed_portrait",
+    # Unit 4
+    "fig_hog", "fig_sift_keypoints", "fig_matching_overview", "fig_rotation_scale_sweep",
+    # Unit 5
+    "fig_haar_vs_yolo_portrait", "fig_haar_min_neighbors", "fig_rotation_robustness",
+    "fig_video_frame_detections", "fig_front_camera_detections", "fig_consecutive_frames", "fig_motion_snapshots", "fig_motion_timeseries",
+]
 
 MOTION = {
     "max_side": 640,  # frames are resized so their longer side is at most this (speed)

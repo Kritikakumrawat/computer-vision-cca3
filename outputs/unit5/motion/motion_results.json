@@ -1,0 +1,112 @@
+{
+  "task": "Unit 5B - Video motion estimation",
+  "status": "completed",
+  "parameters": {
+    "max_side": 640,
+    "max_seconds": 60.0,
+    "expected_duration": [
+      15.0,
+      30.0
+    ],
+    "fallback_fps": 30.0,
+    "diff_blur": 5,
+    "diff_threshold": 25,
+    "min_region_fraction": 0.002,
+    "mog2_history": 300,
+    "mog2_var_threshold": 16,
+    "mog2_detect_shadows": true,
+    "mask_kernel": 5,
+    "lk_max_corners": 200,
+    "lk_quality_level": 0.01,
+    "lk_min_distance": 7,
+    "lk_block_size": 7,
+    "lk_win_size": 21,
+    "lk_max_level": 3,
+    "lk_redetect_every": 10,
+    "lk_moving_threshold": 1.0,
+    "arrow_scale": 3.0,
+    "snapshot_fractions": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "consecutive_frames": 3,
+    "gif_seconds": 4.0,
+    "gif_width": 480,
+    "output_video_tile_width": 320
+  },
+  "video": {
+    "file": "original_video.mp4",
+    "fps": 59.923019785265716,
+    "fps_valid": true,
+    "frame_count": 1479,
+    "width": 832,
+    "height": 464,
+    "duration_s": 24.68166666666667,
+    "file_size_mb": 4.959494,
+    "warnings": []
+  },
+  "processed_frames": 1479,
+  "processed_size": "640x357",
+  "snapshot_frames": [
+    170,
+    369,
+    739,
+    1109
+  ],
+  "peak_motion_frame": 170,
+  "summary": [
+    {
+      "technique": "Frame differencing",
+      "mean_foreground_pct": 2.0743606982711893,
+      "mean_regions_per_frame": 2.0994587280108252,
+      "mean_ms_per_frame": 0.8611337619608221,
+      "output": "Binary mask of pixels that changed since the previous frame"
+    },
+    {
+      "technique": "GMM background subtraction (MOG2)",
+      "mean_foreground_pct": 4.3347196794820775,
+      "mean_regions_per_frame": 1.6813261163734776,
+      "mean_ms_per_frame": 6.284093639923005,
+      "output": "Binary mask of pixels that differ from the learned background"
+    },
+    {
+      "technique": "Lucas-Kanade optical flow",
+      "mean_tracked_points": 199.69215155615697,
+      "mean_moving_points": 22.87144790257104,
+      "mean_moving_speed_px_per_frame": 2.0650920001676507,
+      "mean_ms_per_frame": 2.5280826114416937,
+      "output": "Sparse motion vectors (direction and speed) at corner points"
+    }
+  ],
+  "mean_mask_iou": 0.15523092682102352,
+  "mean_lk_moving_in_gmm_pct": 41.07038799608689,
+  "files": [
+    "unit5/motion/motion_side_by_side.mp4",
+    "unit5/motion/01_consecutive_frame_00738.jpg",
+    "unit5/motion/01_consecutive_frame_00739.jpg",
+    "unit5/motion/01_consecutive_frame_00740.jpg",
+    "unit5/motion/02_frame_00170.jpg",
+    "unit5/motion/03_frame_00170_diff_mask.png",
+    "unit5/motion/04_frame_00170_mog2_mask.png",
+    "unit5/motion/05_frame_00170_lk_vectors.jpg",
+    "unit5/motion/02_frame_00369.jpg",
+    "unit5/motion/03_frame_00369_diff_mask.png",
+    "unit5/motion/04_frame_00369_mog2_mask.png",
+    "unit5/motion/05_frame_00369_lk_vectors.jpg",
+    "unit5/motion/02_frame_00739.jpg",
+    "unit5/motion/03_frame_00739_diff_mask.png",
+    "unit5/motion/04_frame_00739_mog2_mask.png",
+    "unit5/motion/05_frame_00739_lk_vectors.jpg",
+    "unit5/motion/02_frame_01109.jpg",
+    "unit5/motion/03_frame_01109_diff_mask.png",
+    "unit5/motion/04_frame_01109_mog2_mask.png",
+    "unit5/motion/05_frame_01109_lk_vectors.jpg",
+    "unit5/motion/fig_consecutive_frames.png",
+    "unit5/motion/fig_motion_snapshots.png",
+    "unit5/motion/fig_motion_timeseries.png",
+    "unit5/motion/motion_preview.gif",
+    "unit5/motion/per_frame_motion_statistics.csv",
+    "unit5/motion/motion_comparison.csv"
+  ]
+}

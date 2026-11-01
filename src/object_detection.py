@@ -268,17 +268,14 @@ def run(paths: utils.ProjectPaths, options: dict | None = None) -> dict:
         observations.append(f"The Haar eye cascade returned {len(eyes)} eye box(es) for {len(faces)} detected face(s) "
                             f"(2 eyes expected per face).")
 
-    # --- 4. Frames from the original video
-    video_rows = []
-    video_path = utils.find_input(paths.input_dir, "original_video")
-    if video_path is None:
-        pending.append("Haar/YOLO on frames of the self-recorded video (inputs/original_video.mp4 not supplied)")
-    else:
+    def detect_on_video(video_path, fractions, file_prefix, fig_name, csv_name, title, panel_width):
+        """Run Haar (faces + eyes) and YOLO on frames sampled at `fractions` of a video."""
+        rows, panels, titles = [], [], []
         cap = cv2.VideoCapture(str(video_path))
         try:
             total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-            frame_panels, frame_titles = [], []
-            for fraction in params["video_frame_fractions"]:
+            fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+            for fraction in fractions:
                 index = max(0, min(total - 1, int(fraction * total))) if total > 0 else 0
                 cap.set(cv2.CAP_PROP_POS_FRAMES, index)
                 ok, frame = cap.read()
@@ -287,24 +284,56 @@ def run(paths: utils.ProjectPaths, options: dict | None = None) -> dict:
                 f_gray = utils.to_gray(frame)
                 f_faces = detect_haar(f_gray, face_cascade, params["haar_scale_factor"], params["haar_min_neighbors"],
                                       0.04)
-                canvas = draw_haar(frame, f_faces)
-                row = {"frame_index": index, "haar_faces": len(f_faces)}
+                f_eyes = [e for f in f_faces for e in detect_eyes(f_gray, f, eye_cascade)]
+                canvas = draw_haar(frame, f_faces, f_eyes)
+                row = {"frame_index": index, "time_s": round(index / fps, 1), "haar_faces": len(f_faces),
+                       "haar_eyes": len(f_eyes)}
                 if yolo_model is not None:
                     dets = detect_yolo(yolo_model, frame, params["yolo_confidence"])
                     row["yolo_detections"] = summarize_yolo(dets)
                     canvas = draw_yolo(canvas, dets)
-                keep(utils.write_image(out_dir / f"10_video_frame_{index:05d}_detections.jpg", canvas))
-                video_rows.append(row)
-                frame_panels.append(canvas)
-                frame_titles.append(f"Frame {index}: Haar {len(f_faces)} face(s)"
-                                    + (f"\nYOLO: {row['yolo_detections']}" if "yolo_detections" in row else ""))
-            if frame_panels:
-                fig = utils.image_grid_figure(frame_panels, frame_titles, "Detections on frames of the original video",
-                                              cols=len(frame_panels), panel_width=4.0)
-                keep(utils.finish_figure(fig, out_dir / "fig_video_frame_detections.png"))
-                keep(utils.save_csv(out_dir / "video_frame_detections.csv", video_rows))
+                keep(utils.write_image(out_dir / f"{file_prefix}_{index:05d}_detections.jpg", canvas))
+                rows.append(row)
+                panels.append(canvas)
+                titles.append(f"Frame {index} ({row['time_s']} s): Haar {len(f_faces)} face(s)"
+                              + (f"\nYOLO: {row['yolo_detections']}" if "yolo_detections" in row else ""))
         finally:
             cap.release()
+        if panels:
+            fig = utils.image_grid_figure(panels, titles, title, cols=len(panels), panel_width=panel_width)
+            keep(utils.finish_figure(fig, out_dir / fig_name))
+            keep(utils.save_csv(out_dir / csv_name, rows))
+        return rows
+
+    # --- 4. Frames from the self-recorded videos
+    video_rows = []
+    video_path = utils.find_input(paths.input_dir, "original_video")
+    if video_path is None:
+        pending.append("Haar/YOLO on frames of the self-recorded video (inputs/original_video.mp4 not supplied)")
+    else:
+        video_rows = detect_on_video(video_path, params["video_frame_fractions"], "10_video_frame",
+                                     "fig_video_frame_detections.png", "video_frame_detections.csv",
+                                     "Detections on frames of the original video", 4.0)
+    # Optional second clip recorded with the front camera (frontal face, the case Haar is built for)
+    face_rows = []
+    face_video = utils.find_input(paths.input_dir, "front_camera_video")
+    if face_video is not None:
+        face_rows = detect_on_video(face_video, params["face_video_frame_fractions"], "11_front_camera_frame",
+                                    "fig_front_camera_detections.png", "front_camera_frame_detections.csv",
+                                    "Detections on frames of the front-camera video", 2.6)
+        for row in face_rows:
+            if row["haar_faces"] == 0:
+                observations.append(f"Missed detection: the Haar cascade found no face in front-camera frame "
+                                    f"{row['frame_index']} ({row['time_s']} s).")
+            elif row["haar_faces"] > 1:
+                observations.append(f"Extra detection: the Haar cascade returned {row['haar_faces']} face boxes in "
+                                    f"front-camera frame {row['frame_index']} ({row['time_s']} s), which shows one face.")
+        extra_eyes = [r for r in face_rows if r["haar_eyes"] > 2 * r["haar_faces"]]
+        if extra_eyes:
+            observations.append(
+                f"Incorrect eye detections: in {len(extra_eyes)} of {len(face_rows)} front-camera frames the eye cascade "
+                f"returned more than two eye boxes per face (up to {max(r['haar_eyes'] for r in face_rows)} in one "
+                "frame); the extra boxes fall on other dark facial features such as the nostrils or mouth.")
 
     comparison = [
         {"aspect": "What it detects", "haar": "One object type per cascade file (here: frontal faces, eyes)",
@@ -329,6 +358,7 @@ def run(paths: utils.ProjectPaths, options: dict | None = None) -> dict:
         "haar_min_neighbors_sweep": sweep_rows,
         "rotation_robustness": rotation_rows,
         "video_frames": video_rows,
+        "front_camera_frames": face_rows,
         "comparison": comparison,
         "observations": observations,
         "pending": pending,

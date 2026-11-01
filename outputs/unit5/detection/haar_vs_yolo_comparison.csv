@@ -2,5 +2,5 @@ aspect,haar,yolo
 What it detects,"One object type per cascade file (here: frontal faces, eyes)","80 COCO classes (person, chair, phone, ...) in one pass"
 Output,Boxes only (no class score),Boxes + class label + confidence score
 Portrait result,"1 face box(es), 2 eye box(es)",person 0.91
-Time on this CPU (portrait),21 ms (face cascade),62 ms (after warm-up)
+Time on this CPU (portrait),20 ms (face cascade),60 ms (after warm-up)
 Model size / training,Small XML file shipped with OpenCV; boosted rectangle features,Neural network weights downloaded once; trained on COCO

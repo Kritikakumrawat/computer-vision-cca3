@@ -1,0 +1,6 @@
+experiment,image2_size,keypoints_1,keypoints_2,ratio_test_matches,match_ratio_pct,ransac_model,ransac_inliers,inlier_ratio_pct,matcher,detect_ms,match_ms,pair_type,transform,value
+Original vs second photo,463x609,545,1677,19,3.4862385321100917,fundamental,9,47.36842105263158,bf,38.39180000068154,3.7943000061204657,real two-photo pair,none,0
+Original vs second photo rotation 45,758x758,545,1838,10,1.834862385321101,fundamental,7,70.0,bf,66.3397000025725,4.880499996943399,,rotation,45
+Original vs second photo rotation 90,609x463,545,1680,20,3.669724770642202,fundamental,9,45.0,bf,36.67069999210071,4.385199994430877,,rotation,90
+Original vs second photo resize 0.5,232x304,545,660,13,2.385321100917431,fundamental,8,61.53846153846154,bf,13.90920000267215,1.705299990135245,,resize,0.5
+Original vs second photo resize 1.5,694x914,545,3125,21,3.853211009174312,fundamental,10,47.61904761904762,bf,74.8435999994399,6.74730000901036,,resize,1.5

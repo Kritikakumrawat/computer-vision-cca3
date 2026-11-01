@@ -1,0 +1,80 @@
+{
+  "steps": {
+    "check_inputs": {
+      "step": "check_inputs",
+      "title": "Input check",
+      "command": "python main.py --check-inputs",
+      "exit_code": 0,
+      "started": "2026-11-01T20:41:19",
+      "finished": "2026-11-01T20:41:22",
+      "terminal_screenshot": "outputs/screenshot_terminal_check_inputs.png",
+      "window_screenshots": []
+    },
+    "unit3": {
+      "step": "unit3",
+      "title": "Unit 3 run",
+      "command": "python main.py --unit 3 --screenshots",
+      "exit_code": 0,
+      "started": "2026-11-01T20:41:22",
+      "finished": "2026-11-01T20:42:20",
+      "terminal_screenshot": "outputs/unit3/screenshot_terminal_unit3.png",
+      "window_screenshots": [
+        "outputs/unit3/restoration/screenshot_01_original_display.jpg",
+        "outputs/unit3/restoration/screenshot_fig_gaussian_noise_comparison.jpg",
+        "outputs/unit3/restoration/screenshot_fig_salt_pepper_comparison.jpg",
+        "outputs/unit3/restoration/screenshot_fig_zoomed_face_comparison.jpg",
+        "outputs/unit3/segmentation/screenshot_fig_canny.jpg",
+        "outputs/unit3/segmentation/screenshot_fig_morphology.jpg",
+        "outputs/unit3/segmentation/screenshot_fig_thresholding.jpg",
+        "outputs/unit3/segmentation/screenshot_fig_watershed_objects.jpg",
+        "outputs/unit3/segmentation/screenshot_fig_watershed_portrait.jpg"
+      ]
+    },
+    "unit4": {
+      "step": "unit4",
+      "title": "Unit 4 run",
+      "command": "python main.py --unit 4 --screenshots",
+      "exit_code": 0,
+      "started": "2026-11-01T20:42:20",
+      "finished": "2026-11-01T20:42:42",
+      "terminal_screenshot": "outputs/unit4/screenshot_terminal_unit4.png",
+      "window_screenshots": [
+        "outputs/unit4/screenshot_fig_hog.jpg",
+        "outputs/unit4/screenshot_fig_matching_overview.jpg",
+        "outputs/unit4/screenshot_fig_rotation_scale_sweep.jpg",
+        "outputs/unit4/screenshot_fig_sift_keypoints.jpg"
+      ]
+    },
+    "unit5": {
+      "step": "unit5",
+      "title": "Unit 5 run",
+      "command": "python main.py --unit 5 --screenshots",
+      "exit_code": 0,
+      "started": "2026-11-01T20:42:42",
+      "finished": "2026-11-01T20:43:55",
+      "terminal_screenshot": "outputs/unit5/screenshot_terminal_unit5.png",
+      "window_screenshots": [
+        "outputs/unit5/detection/screenshot_fig_front_camera_detections.jpg",
+        "outputs/unit5/detection/screenshot_fig_haar_min_neighbors.jpg",
+        "outputs/unit5/detection/screenshot_fig_haar_vs_yolo_portrait.jpg",
+        "outputs/unit5/detection/screenshot_fig_rotation_robustness.jpg",
+        "outputs/unit5/detection/screenshot_fig_video_frame_detections.jpg",
+        "outputs/unit5/motion/screenshot_fig_consecutive_frames.jpg",
+        "outputs/unit5/motion/screenshot_fig_motion_snapshots.jpg",
+        "outputs/unit5/motion/screenshot_fig_motion_timeseries.jpg"
+      ]
+    },
+    "tests": {
+      "step": "tests",
+      "title": "Automated tests",
+      "command": "python -m pytest -v -p no:cacheprovider",
+      "exit_code": 0,
+      "started": "2026-11-01T20:43:55",
+      "finished": "2026-11-01T20:44:38",
+      "terminal_screenshot": "outputs/screenshot_terminal_pytest.png",
+      "window_screenshots": []
+    }
+  },
+  "method": "Real console windows (conhost + Windows PowerShell) and live matplotlib windows, each captured with the Win32 PrintWindow API by tools/capture_screenshots.py",
+  "screen": "1920x1008 px work area, 150% scaling"
+}

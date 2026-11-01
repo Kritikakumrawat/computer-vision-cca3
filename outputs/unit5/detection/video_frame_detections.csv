@@ -1,0 +1,4 @@
+frame_index,time_s,haar_faces,haar_eyes,yolo_detections
+295,4.9,0,0,"person 0.91, bed 0.86"
+739,12.3,0,0,bed 0.74
+1183,19.7,0,0,"person 0.86, bed 0.36"

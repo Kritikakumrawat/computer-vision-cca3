@@ -254,9 +254,9 @@ def _sweep_figure(rotation_rows, scale_rows, path):
         ax.set_title(f"{title}: how many matches survive", fontweight="bold")
         ax2.set_title(f"{title}: are the matches correct?", fontweight="bold")
     handles, labels = axes[0][0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", ncol=2, bbox_to_anchor=(0.5, 1.02))
-    fig.suptitle("SIFT matching: original photo versus transformed copies of itself", y=1.06, fontweight="bold")
-    fig.tight_layout()
+    fig.legend(handles, labels, loc="upper center", ncol=2, bbox_to_anchor=(0.5, 0.955))
+    fig.suptitle("SIFT matching: original photo versus transformed copies of itself", y=0.995, fontweight="bold")
+    fig.tight_layout(rect=(0, 0, 1, 0.91))
     return utils.finish_figure(fig, path)
 
 
@@ -274,18 +274,31 @@ def run(paths: utils.ProjectPaths, options: dict | None = None) -> dict:
     photo_path = utils.require_input(paths.input_dir, "original_photo")
     original = utils.read_image(photo_path)
     second_path = utils.find_input(paths.input_dir, "second_photo")
+    second_kind = "photograph"
+    if second_path is None:
+        # Fallback: a frame extracted from the student's own video (tools/extract_video_frame.py).
+        # It is labelled as a video frame everywhere and never called a photograph.
+        second_path = utils.find_input(paths.input_dir, "second_image_video_frame")
+        if second_path is not None:
+            second_kind = "video frame"
     second = utils.read_image(second_path) if second_path else None
+    second_name = "Second photo" if second_kind == "photograph" else "Video frame"
     if second is None:
         pending.append("Original vs second photograph matching (inputs/second_photo.jpg not supplied)")
         LOG.warning("second_photo not found - the two-photo experiment is PENDING; "
                     "a clearly labelled synthetic view is used for a preliminary test.")
+    elif second_kind == "video frame":
+        pending.append("A separately taken second photograph (inputs/second_photo.jpg) - Unit 4 used a frame "
+                       "extracted from the self-recorded video instead")
+        LOG.warning("second_photo not found - using %s, a FRAME EXTRACTED FROM A VIDEO (not a separate photograph).",
+                    second_path.name)
 
     # --- 1. HOG
     hog_rows = []
     hog_views = {}
     images_for_hog = {"Original photo": original}
     if second is not None:
-        images_for_hog["Second photo"] = second
+        images_for_hog[second_name] = second
     for label, image in images_for_hog.items():
         small, _ = utils.resize_to_max_side(utils.to_gray(image), params["hog_max_side"])
         for ppc in params["hog_pixels_per_cell"]:
@@ -309,9 +322,9 @@ def run(paths: utils.ProjectPaths, options: dict | None = None) -> dict:
         f"HOG, {p}x{p}-pixel cells\n{next(r['feature_length'] for r in hog_rows if r['image'] == 'Original photo' and r['pixels_per_cell'] == p):,} features"
         for p in params["hog_pixels_per_cell"]]
     if second is not None:
-        s_small, s_view = hog_views[("Second photo", mid_ppc)]
+        s_small, s_view = hog_views[(second_name, mid_ppc)]
         hog_images += [s_small, s_view]
-        hog_titles += ["Second photo (grayscale)", f"Second photo HOG, {mid_ppc}x{mid_ppc} cells"]
+        hog_titles += [f"{second_name} (grayscale)", f"{second_name} HOG, {mid_ppc}x{mid_ppc} cells"]
     fig = utils.image_grid_figure(
         hog_images, hog_titles, "Histogram of Oriented Gradients (HOG)",
         caption=(f"Each cell shows its dominant gradient directions as short white lines; brighter lines mean stronger "
@@ -337,7 +350,7 @@ def run(paths: utils.ProjectPaths, options: dict | None = None) -> dict:
         with utils.timer() as t2:
             kp_second, desc_second = detect_and_describe(second, sift)
         keep(utils.write_image(out_dir / "03_sift_keypoints_second.jpg", draw_keypoints(second, kp_second)))
-        sift_rows.append({"image": "Second photo", "size": f"{second.shape[1]}x{second.shape[0]}",
+        sift_rows.append({"image": second_name, "size": f"{second.shape[1]}x{second.shape[0]}",
                           "keypoints": len(kp_second),
                           "descriptor_shape": f"{0 if desc_second is None else desc_second.shape[0]}x128",
                           "time_ms": t2["ms"]})
@@ -367,15 +380,30 @@ def run(paths: utils.ProjectPaths, options: dict | None = None) -> dict:
 
     # --- 3. Matching between the two photographs (or a preliminary synthetic view)
     if second is not None:
-        stats, (kp2, m, inl) = match_experiment("Original vs second photo", original, features_orig, second, ratio,
+        pair_name = f"Original vs {second_name.lower()}"
+        stats, (kp2, m, inl) = match_experiment(pair_name, original, features_orig, second, ratio,
                                                 "fundamental", ransac, sift=sift)
-        stats["pair_type"] = "real two-photo pair"
+        stats["pair_type"] = ("real two-photo pair" if second_kind == "photograph" else
+                              "photo vs frame extracted from the student's video (NOT a separately taken photograph)")
         match_rows.append(stats)
         img = draw_matches(original, kp_orig, second, kp2, m, inl, params["max_matches_drawn"])
         keep(utils.write_image(out_dir / "04_matches_original_vs_second.jpg", img))
-        match_images.append((img, f"Original vs second photo: {stats['ratio_test_matches']} matches, "
+        match_images.append((img, f"{pair_name}: {stats['ratio_test_matches']} matches, "
                                   f"{stats['ransac_inliers']} inliers"))
-        main_pair = ("Original vs second photo", second, "fundamental", None)
+        main_pair = (pair_name, second, "fundamental", None)
+        # Optional extra pair: two of the student's photographs taken in the SAME scene
+        third_path = utils.find_input(paths.input_dir, "second_photo_b") if second_kind == "photograph" else None
+        if third_path is not None:
+            third = utils.read_image(third_path)
+            same_scene, (kp3, m3, inl3) = match_experiment(
+                "Second photo vs second photo B (same scene)", second, (kp_second, desc_second), third, ratio,
+                "fundamental", ransac, sift=sift)
+            same_scene["pair_type"] = "two photographs of the same scene (both supplied by the student)"
+            match_rows.append(same_scene)
+            img3 = draw_matches(second, kp_second, third, kp3, m3, inl3, params["max_matches_drawn"])
+            keep(utils.write_image(out_dir / "04b_matches_second_vs_second_b_same_scene.jpg", img3))
+            match_images.append((img3, f"Second photo vs photo B (same scene): {same_scene['ratio_test_matches']} "
+                                       f"matches, {same_scene['ransac_inliers']} inliers"))
     else:
         view_img, view_h = synthetic_viewpoint(original)
         keep(utils.write_image(out_dir / "04_PRELIMINARY_synthetic_view_of_original.jpg", view_img))
@@ -444,7 +472,7 @@ def run(paths: utils.ProjectPaths, options: dict | None = None) -> dict:
         for label, fn, value in (("rotation", rotate_image, 45), ("rotation", rotate_image, 90),
                                  ("resize", resize_image, 0.5), ("resize", resize_image, 1.5)):
             img2, _ = fn(second, value)
-            s, extra = match_experiment(f"Original vs second photo {label} {value:g}", original, features_orig, img2,
+            s, extra = match_experiment(f"Original vs {second_name.lower()} {label} {value:g}", original, features_orig, img2,
                                         ratio, "fundamental", ransac, sift=sift)
             s.update({"transform": label, "value": value})
             second_rows.append(s)
@@ -453,21 +481,24 @@ def run(paths: utils.ProjectPaths, options: dict | None = None) -> dict:
         pending.append("Rotation/resizing of the second photograph (needs inputs/second_photo.jpg)")
 
     # Overview figure of the match pictures
-    fig, axes = plt.subplots(len(match_images), 1, figsize=(11, 3.9 * len(match_images)))
-    axes = np.atleast_1d(axes)
-    for ax, (img, title) in zip(axes, match_images):
+    cols = 2 if len(match_images) > 1 else 1
+    rows = int(np.ceil(len(match_images) / cols))
+    fig, axes = plt.subplots(rows, cols, figsize=(8.5 * cols, 4.4 * rows), squeeze=False)
+    for ax in axes.flat:
+        ax.axis("off")
+    for ax, (img, title) in zip(axes.flat, match_images):
         ax.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         ax.set_title(title, fontsize=10)
-        ax.axis("off")
     fig.suptitle("SIFT feature matching (green = RANSAC inliers, red = rejected matches)", fontweight="bold")
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
     keep(utils.finish_figure(fig, out_dir / "fig_matching_overview.png"))
 
     keep(utils.save_csv(out_dir / "pair_matching.csv", match_rows))
     results = {
         "task": "Unit 4 - Feature extraction and matching",
         "status": "completed" if not pending else "partial",
-        "inputs": {"original_photo": photo_path.name, "second_photo": second_path.name if second_path else None},
+        "inputs": {"original_photo": photo_path.name, "second_image": second_path.name if second_path else None,
+                   "second_image_kind": second_kind if second_path else None},
         "parameters": params,
         "hog": hog_rows,
         "sift": sift_rows,

@@ -1,10 +1,41 @@
 # CCA 3 – Computer Vision Practical Assignment (Units 3, 4 and 5)
 
-Python implementation of image restoration, segmentation, feature extraction,
-object recognition and motion estimation, applied to the student's own
-photograph and (once supplied) a self-recorded video.
+**Repository:** https://github.com/Kritikakumrawat/computer-vision-cca3 (branch `main`)  
+**Explanation video:** https://drive.google.com/file/d/1KC3AiaGDgUWXWRE5pkoV7XZHZk3L9u9n/view?usp=drivesdk  
+**Student:** Kritika Kumrawat · PRN 1272251096 · MCA E · Instructor: Rahul Inchal · Submission: 3 November 2026
 
-Libraries: **OpenCV, NumPy, Matplotlib, scikit-image, Ultralytics YOLO**.
+## Project overview
+
+A Python project that applies classic and deep-learning computer-vision
+techniques to the student's own photograph and self-recorded videos, measures
+the results and compares the techniques. One command (`python main.py --all`)
+runs everything and writes every image, figure, table and JSON result to
+`outputs/`; a second command builds the technical report (DOCX + PDF) from
+those results, so every number in the report comes from an actual run.
+
+## Technologies
+
+| Technology | Used for |
+|---|---|
+| Python 3.11 | Language (tested on Windows 11, CPU only) |
+| OpenCV 4.14 | Filtering, thresholding, morphology, Canny, watershed, SIFT, matching, RANSAC, Haar cascades, MOG2, Lucas–Kanade, video I/O |
+| NumPy | Image arrays, seeded synthetic noise, statistics |
+| scikit-image | PSNR/SSIM, HOG, peak detection and watershed, sample image |
+| SciPy | Hole filling, labelling |
+| Matplotlib | All comparison figures and charts |
+| Ultralytics YOLO11n (PyTorch CPU) | Pretrained object detector (COCO, 80 classes) |
+| Pillow | GIF output |
+| python-docx, pywin32 (Word) | Report generation and PDF export |
+| pytest | Automated tests |
+
+## Features
+
+- Every assignment task in its own module, run through one entry point with `--unit 3/4/5` or `--all`.
+- All parameters in `src/config.py`; fixed random seed, so results are repeatable.
+- Missing inputs never crash a run: tasks are marked **PENDING** and the rest continue.
+- Measured comparisons: PSNR/SSIM for every filter and kernel size, blob/hole counts, edge densities, SIFT correct-match rates under rotation/scale/lighting, Haar vs YOLO robustness tests, per-frame motion statistics and timings.
+- Genuine execution screenshots captured automatically from real console and figure windows.
+- Report built automatically from the outputs (DOCX + PDF), 34 automated tests.
 
 | Task | Unit | What is implemented | Code |
 |---|---|---|---|
@@ -19,8 +50,10 @@ Libraries: **OpenCV, NumPy, Matplotlib, scikit-image, Ultralytics YOLO**.
 | Input | Status | Effect |
 |---|---|---|
 | `inputs/original_photo.jpg` | Present | Units 3, 4 and 5A complete |
-| `inputs/second_photo.jpg` | **Missing** | Two-photo SIFT matching pending (a clearly labelled synthetic view is used as a preliminary test) |
-| `inputs/original_video.mp4` | **Missing** | Unit 5B motion results and detections on video frames pending (code complete and tested on a synthetic clip) |
+| `inputs/original_video.mp4` | Present (24.7 s self-recorded clip, 832×464, 60 fps) | Unit 5B motion estimation and Unit 5A video-frame detection complete |
+| `inputs/front_camera_video.mp4` | Present (5.9 min self-recorded front-camera clip) | Optional: 5 frames used for Haar/YOLO face detection in Unit 5A |
+| `inputs/second_photo.png` | Present (463×609 close-up photo of the student) | Unit 4 two-photo matching, plus rotation/resizing of the second photo |
+| `inputs/second_photo_b.png` | Present (277×399 wider photo, same scene as the second photo) | Optional extra same-scene matching pair in Unit 4 |
 
 See [`inputs/README.md`](inputs/README.md) for what to capture, then run
 `python main.py --all` and `python tools/build_report.py` again.
@@ -38,19 +71,20 @@ StudentComputerVisionAssignment/
 │   ├── segmentation.py      # Unit 3B
 │   ├── feature_extraction.py# Unit 4
 │   ├── object_detection.py  # Unit 5A
-│   └── motion_estimation.py # Unit 5B
+│   ├── motion_estimation.py # Unit 5B
+│   └── screen_capture.py    # Windows window capture for the execution screenshots
 ├── inputs/                  # your photo / video (kept out of Git)
 ├── outputs/
 │   ├── unit3/restoration/   # noisy + restored images, metrics CSV, figures
 │   ├── unit3/segmentation/  # masks, morphology, edges, watershed
 │   ├── unit4/               # HOG, SIFT keypoints, matches, sweep tables
 │   ├── unit5/detection/     # Haar / YOLO images and tables
-│   ├── unit5/motion/        # (after the video is added) masks, vectors, video, GIF
+│   ├── unit5/motion/        # frames, masks, motion vectors, GIF (side-by-side MP4 is local only)
 │   └── run_summary.json     # status of every task in the last run
 ├── reports/                 # CCA3_Technical_Report.docx / .pdf
 ├── docs/                    # algorithm explanations, video script, submission checklist
 ├── tests/                   # pytest suite (synthetic + public sample data only)
-├── tools/                   # build_report.py, export_pdf.py
+├── tools/                   # capture_screenshots.py, extract_video_frame.py, build_report.py, export_pdf.py
 ├── notebooks/               # how to use the code from Jupyter
 └── models/                  # YOLO weights, downloaded automatically (not in Git)
 ```
@@ -88,6 +122,7 @@ python main.py --unit 5           # Haar/YOLO + motion
 python main.py --all              # everything
 python main.py --unit 5 --skip-yolo
 python main.py --all --show       # also open every figure in a window
+python main.py --unit 3 --screenshots   # Windows: show the main figures and save a screenshot of each window
 ```
 
 Options: `--inputs`, `--outputs`, `--models` change the folders;
@@ -111,12 +146,37 @@ download fails, Task 5A still runs the Haar cascade and marks YOLO as pending.
 python -m pytest
 ```
 
-31 tests cover noise, filters and metrics, thresholding/morphology/Canny,
+34 tests cover noise, filters and metrics, thresholding/morphology/Canny,
 watershed on touching discs, HOG length, SIFT rotation/scale matching,
 Haar loading and detection, YOLO (skipped if the weights are not downloaded),
 video validation, frame differencing, Lucas–Kanade on a known shift, the full
 motion pipeline on a generated clip, and `main.py` with missing and present
-inputs. The tests never touch your personal photo or video.
+inputs, plus the screenshot option (without opening windows). The tests never touch
+your personal photo or video.
+
+## Execution screenshots
+
+```
+python tools/capture_screenshots.py              # all steps (about 4 minutes)
+python tools/capture_screenshots.py unit5        # only one step, e.g. after adding the video
+```
+
+For each step (input check, Unit 3, Unit 4, Unit 5, pytest) the tool opens a
+real console window, runs the command there and, when it has finished, captures
+that window with the Windows `PrintWindow` function. The unit runs use
+`main.py --screenshots`, so the result figures appear in live windows during the
+run and each window is captured too. Only the program's own windows are
+captured. Windows pop up for a few minutes – do not close them by hand.
+
+Where the screenshots are saved (no extra folder – next to the results they show):
+
+| Screenshot | Location |
+|---|---|
+| Console runs | `outputs/screenshot_terminal_check_inputs.png`, `outputs/screenshot_terminal_pytest.png`, `outputs/unit3/screenshot_terminal_unit3.png`, `outputs/unit4/screenshot_terminal_unit4.png`, `outputs/unit5/screenshot_terminal_unit5.png` |
+| Result windows | `screenshot_<figure>.jpg` beside each figure, e.g. `outputs/unit3/restoration/screenshot_fig_salt_pepper_comparison.jpg` |
+| Index (used by the report) | `outputs/screenshots_index.json` |
+
+Requires Windows and `pywin32` (in requirements.txt).
 
 ## Report
 
@@ -125,9 +185,10 @@ python tools/build_report.py      # reports/CCA3_Technical_Report.docx (all numb
 python tools/export_pdf.py        # optional: updates the contents page and saves a PDF via Microsoft Word
 ```
 
-Fill in the yellow-highlighted fields (name, PRN, Git URL, video link) in Word.
-If you rebuild the report later, those manual edits are overwritten, so fill
-them in last.
+The report includes the screenshots in Section 8 ("Execution screenshots").
+Student details and the repository URL are set at the top of
+`tools/build_report.py`, together with the explanation-video link. Rebuilding
+overwrites any manual edits made in Word.
 
 ## Algorithms in brief
 
@@ -146,14 +207,22 @@ Full beginner-friendly explanations: [`docs/ALGORITHM_EXPLANATIONS.md`](docs/ALG
 - **YOLO** – one-pass neural network detector for 80 object classes.
 - **Frame differencing / MOG2 / Lucas–Kanade** – changed pixels, learned background, point motion vectors.
 
-## Results at a glance (delivered run, 28 Oct 2026)
+## Results at a glance (run of 1 Nov 2026)
 
 - Salt-and-pepper noise (5 %): noisy 17.98 dB → median 3×3 **47.43 dB** (SSIM 0.995); best Gaussian filter 31.73 dB.
 - Gaussian noise (σ = 25): noisy 20.44 dB → Gaussian 11×11 34.52 dB, median 11×11 34.42 dB (similar).
 - Watershed on the coins sample: 22 blobs after thresholding → 24 regions (one per coin).
 - SIFT: 545 keypoints; ≥ 95 % correct matches at every tested rotation, 84 % at 0.25× scale.
+  Portrait vs second photo: only 19 ratio-test matches and none connects the same feature (different place,
+  clothes, hair and lighting); the two small same-scene photos gave 14 matches, none confirmed – SIFT is
+  rotation/scale invariant but cannot match different scenes, and low resolution limits it further.
 - Haar found the face upright but missed it at 30°, 45° and 90°, and gave false boxes with minNeighbors 1–2;
   YOLO found the person at every angle (0.91 upright) but returned a duplicate box at 90°.
+- Video (24.7 s, 1479 frames): frame differencing marked 2.07 % of each frame on average, MOG2 4.33 %;
+  Lucas–Kanade tracked about 200 corners, about 23 of them moving at 2.07 px/frame. YOLO found the person
+  and the bed in the sampled frames; the frontal-face Haar cascade found no face (back and side views).
+- Front-camera frames: Haar found the face in all 5 frames but added a false face box in 2 and extra eye boxes;
+  YOLO found the person in every frame (0.92–0.95).
 
 Full tables and figures: `reports/CCA3_Technical_Report.pdf`.
 
@@ -171,15 +240,19 @@ Full tables and figures: `reports/CCA3_Technical_Report.pdf`.
 
 ## Git and privacy
 
-`.gitignore` keeps `inputs/` (personal photo/video), `.venv/`, model weights and
-large output videos out of the repository. The generated figures in `outputs/`
-are derived from the portrait, so make the GitHub repository **private** and add
-the instructor as a collaborator. Step-by-step commands are in
-[`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md).
+Repository: https://github.com/Kritikakumrawat/computer-vision-cca3 (branch `main`).
+
+`.gitignore` keeps `inputs/` (personal photo and videos), `.venv/`, `.tools/`,
+model weights, large output videos, caches, environment/secret files and
+temporary files out of the repository. The original media are submitted
+through Google Drive (and inside the submission ZIP) instead, as the assignment
+asks for large raw videos. The generated figures in `outputs/` and the report
+show the student's face; keep that in mind if the repository is public. Upload
+commands are in [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md).
 
 ## Limitations / pending
 
-- Two-photo matching waits for `inputs/second_photo.jpg`.
-- Motion estimation and detection on video frames wait for `inputs/original_video.mp4`.
+- The second photographs are small PNG copies (277×399 and 463×609, no camera metadata); the phone's full-resolution originals would give SIFT more detail to match.
+- The video was received through WhatsApp, which re-encodes it; if the camera's original file is available, replace `inputs/original_video.mp4` and re-run.
 - The watershed touching-objects experiment uses a public sample unless you add `inputs/watershed_photo.jpg`.
-- The explanation video and the Git repository URL must be added to the report by the student.
+- `tools/extract_video_frame.py` can extract a labelled face frame from a video as a Unit 4 fallback; it is not used now that a second photograph exists.

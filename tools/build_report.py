@@ -35,8 +35,47 @@ OUT = config.DEFAULT_OUTPUT_DIR
 REPORT_PATH = ROOT / "reports" / "CCA3_Technical_Report.docx"
 ACCENT = RGBColor(0x1F, 0x3B, 0x63)
 MUTED = RGBColor(0x52, 0x51, 0x4E)
-GIT_URL_PLACEHOLDER = "[PENDING - paste the Git repository URL here after creating and pushing the repository]"
-VIDEO_URL_PLACEHOLDER = "[PENDING - paste the Google Drive link of the explanation video here after recording and uploading it]"
+STUDENT_NAME = "Kritika Kumrawat"
+STUDENT_PRN = "1272251096"
+PROGRAMME = "MCA E"
+INSTRUCTOR = "Rahul Inchal"
+SUBMISSION_DATE = "3 November 2026"
+# What the self-recorded video shows (written after viewing it; update if the video is replaced).
+VIDEO_DESCRIPTION = (
+    "Recorded by the student with a phone held still in one position. The scene is a room with a white wall, an "
+    "orange wall with a window, a purple curtain, a bed and a blue box on the floor. The student walks into the frame, "
+    "crosses the room towards and away from the camera, and leaves the frame several times; for some seconds nobody is "
+    "visible. The file was shared through WhatsApp, which re-encodes videos, so it is not the camera's original file.")
+# Visual check of 04_matches_original_vs_second.jpg (portrait vs video frame).
+MATCH_NOTE_VIDEO_FRAME = (
+    "Visual check of the match picture: none of the drawn lines, including the green RANSAC inliers, connects the "
+    "same feature in both images (for example, eye to hair or blazer button to chin). SIFT therefore failed to match "
+    "the portrait with the video frame. This is an expected limitation: SIFT matches local texture, and the two "
+    "images differ in clothing, hairstyle, background, lighting, expression and camera, so almost no local patch is "
+    "shared even though both show the student. A second photograph of the same scene (same clothes and background, "
+    "taken from a slightly different position) is what the experiment needs.")
+# What the sampled video frames show (observed in fig_video_frame_detections.png).
+VIDEO_FRAME_NOTE = (
+    "In the sampled frames the student is seen from behind or in side profile, or is out of view, so the frontal-face "
+    "Haar cascade found no face; in the profile frame the face is visible, which counts as a missed detection. YOLO "
+    "detected the person whenever she was in view and also labelled the bed.")
+GIT_URL = "https://github.com/Kritikakumrawat/computer-vision-cca3"
+VIDEO_URL = "https://drive.google.com/file/d/1KC3AiaGDgUWXWRE5pkoV7XZHZk3L9u9n/view?usp=drivesdk"
+SECOND_PHOTO_NOTE = ("The file received is a small PNG without camera metadata (a screenshot or exported copy), "
+                     "not the phone's original image.")
+# Visual checks of 04_matches_original_vs_second.jpg and 04b_matches_second_vs_second_b_same_scene.jpg.
+MATCH_NOTE_PHOTOS = (
+    "Visual check of the match picture: none of the drawn lines, including the green RANSAC inliers, connects the "
+    "same feature in both photographs (for example, eye to hair or blazer button to shoulder). SIFT therefore found "
+    "no true correspondences between the portrait and the second photograph. This is expected: SIFT matches local "
+    "texture, and the two photos differ in place, clothing, hairstyle, lighting and camera, so the only shared "
+    "content is the face, seen at a different size, pose and expression.")
+MATCH_NOTE_SAME_SCENE = (
+    "For the two photos taken in the same place, a few lines join one lantern to another, but the lanterns look "
+    "alike, so it cannot be confirmed that they are the same lanterns; most other lines join unrelated features. "
+    "The photos are small (277 x 399 and 463 x 609 pixels), one is a close-up and the other a wide view (a large scale "
+    "change), and repeated objects such as the lanterns make the ratio test reject or confuse matches. Full-resolution "
+    "originals from the phone, or two photos taken from closer positions, would give far more reliable matching.")
 
 
 def load(rel: str):
@@ -319,14 +358,15 @@ def title_page(r: Report):
         align=WD_ALIGN_PARAGRAPH.CENTER, color=MUTED)
     for _ in range(4):
         r.p("")
-    for label, value in (("Student name: ", "[Your full name]"), ("PRN / Roll number: ", "[Your PRN]"),
-                         ("Programme / Division: ", "[Programme, division]"), ("Course instructor: ", "[Instructor name]"),
-                         ("Submission date: ", "[Date of submission]")):
+    for label, value in (("Student name: ", STUDENT_NAME), ("PRN / Roll number: ", STUDENT_PRN),
+                         ("Programme / Division: ", PROGRAMME), ("Course instructor: ", INSTRUCTOR),
+                         ("Submission date: ", SUBMISSION_DATE)):
         paragraph = r.doc.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
         paragraph.add_run(label).bold = True
         run = paragraph.add_run(value)
-        run.font.highlight_color = WD_COLOR_INDEX.YELLOW
+        if value.startswith("["):  # still to be filled in by the student
+            run.font.highlight_color = WD_COLOR_INDEX.YELLOW
     r.p("")
     r.p(f"Results generated by the project code; report built on {date.today():%d %B %Y}.", size=9,
         align=WD_ALIGN_PARAGRAPH.CENTER, color=MUTED)
@@ -393,11 +433,34 @@ def input_section(r: Report, r3, u4, d5, m5):
     else:
         r.pending("inputs/original_photo.jpg has not been supplied.")
 
-    r.h("3.2 Second photograph (Unit 4)", 2)
+    r.h("3.2 Second image for Unit 4", 2)
     second = utils.find_input(config.DEFAULT_INPUT_DIR, "second_photo")
+    frame = utils.find_input(config.DEFAULT_INPUT_DIR, "second_image_video_frame")
     if second:
-        r.p(f"File inputs/{second.name}: second photograph of the same subject, used for SIFT matching.")
-        r.figure(second, "Second photograph of the same subject.", 8.5)
+        import cv2
+
+        sh, sw = cv2.imread(str(second)).shape[:2]
+        r.p(f"File inputs/{second.name}: {sw} x {sh} pixels. A second, separately taken photograph of the student "
+            f"(close-up, indoor shopping street with hanging lanterns), supplied by the student for Unit 4. {SECOND_PHOTO_NOTE}")
+        r.figure(second, "Second photograph of the student (Unit 4).", 6.0)
+        photo_b = utils.find_input(config.DEFAULT_INPUT_DIR, "second_photo_b")
+        if photo_b:
+            bh, bw = cv2.imread(str(photo_b)).shape[:2]
+            r.p(f"File inputs/{photo_b.name}: {bw} x {bh} pixels. A wider photograph taken in the same place as the "
+                "second photograph, used as an extra same-scene matching pair.")
+            r.figure(photo_b, "Photograph B, same scene as the second photograph (wider view).", 5.0)
+    elif frame:
+        info_path = frame.with_suffix(".json")
+        info = utils.load_json(info_path) if info_path.is_file() else {}
+        r.pending("A separately taken second photograph has not been supplied. Unit 4 asks for 'a second photograph "
+                  "of the same object or scene', so the frame below may not satisfy the requirement.")
+        r.p(f"Substitute used: inputs/{frame.name}, a FRAME EXTRACTED FROM THE STUDENT'S OWN VIDEO "
+            f"({info.get('source_video', 'video')}, frame {info.get('frame_index', '?')} at {info.get('time_s', '?')} s), "
+            "not a separately taken photograph. It was chosen automatically by tools/extract_video_frame.py as the "
+            f"sharpest frame with one clear frontal face and both eyes visible ({info.get('selection', '')}). The image is "
+            "saved unchanged from the video.")
+        r.figure(frame, "Frame extracted from the student's front-camera video, used as the second image for Unit 4 "
+                        "(not a separate photograph).", 6.5)
     else:
         r.pending("inputs/second_photo.jpg (a second photograph of the same person/object/scene) has not been supplied. "
                   "The two-photo matching experiment is therefore not yet performed. A clearly labelled synthetic "
@@ -414,14 +477,26 @@ def input_section(r: Report, r3, u4, d5, m5):
         ], [5, 12])
         for warning in v.get("warnings", []):
             r.p(warning, italic=True)
-        r.placeholder("Video description: ", "[Describe what the video shows: the moving person/object, the background "
-                                             "and how the camera was held.]")
+        r.p(VIDEO_DESCRIPTION, bold_prefix="Video description: ")
     else:
         r.pending("inputs/original_video.mp4 (a 15-30 s self-recorded video with a moving person or object) has not "
                   "been supplied. The motion-estimation code is complete and tested on a synthetic clip, but no results "
                   "for the student's video exist yet.")
 
-    r.h("3.4 Supplementary data (clearly not the student's own)", 2)
+    face_video = utils.find_input(config.DEFAULT_INPUT_DIR, "front_camera_video")
+    if face_video:
+        import cv2
+
+        cap = cv2.VideoCapture(str(face_video))
+        fps, count = cap.get(cv2.CAP_PROP_FPS) or 30.0, int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        w, h = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        cap.release()
+        r.h("3.4 Front-camera video (Unit 5A)", 2)
+        r.p(f"File inputs/{face_video.name}: {w} x {h} pixels, {fps:.0f} fps, {count / fps / 60:.1f} minutes, recorded by "
+            "the student with the phone's front camera (head and shoulders, talking to the camera). Only frames "
+            "sampled from it are used, for Haar and YOLO face detection (Section 6.3); it is not used for motion "
+            "estimation. It was also shared through WhatsApp.")
+    r.h(f"3.{5 if face_video else 4} Supplementary data (clearly not the student's own)", 2)
     r.bullet("scikit-image's bundled 'coins' photograph (Greek coins from Pompeii, Brooklyn Museum collection, no known "
              "copyright restrictions) - used for watershed on multiple objects, because the portrait has none.",
              "Watershed sample: ")
@@ -669,6 +744,10 @@ def unit4_section(r: Report, u4):
         r.pending("Matching between the original and an independently captured second photograph has not been done "
                   "because inputs/second_photo.jpg is missing. The row below is a PRELIMINARY code test on a synthetic "
                   "tilted and re-lit copy of the original photograph; it is not a second photograph.")
+    frame_pair = "video" in pair.get("pair_type", "")
+    if frame_pair:
+        r.pending("Matching against a separately taken second photograph has not been done (none supplied). The row "
+                  "below matches the original photograph with a FRAME EXTRACTED FROM THE STUDENT'S VIDEO.")
     r.table("Matching between the two images (pair_matching.csv).",
             ["Pair", "Keypoints 1 / 2", "Ratio-test matches", "Match ratio", "RANSAC inliers", "Correct"],
             [(x["experiment"], f"{x['keypoints_1']} / {x['keypoints_2']}", x["ratio_test_matches"],
@@ -678,8 +757,23 @@ def unit4_section(r: Report, u4):
     match_img = "unit4/04_matches_original_vs_second.jpg" if "PRELIMINARY" not in pair["experiment"] else \
         "unit4/05_PRELIMINARY_matches_synthetic_view.jpg"
     r.figure(match_img, "Matches between the original and " + (
+        "the frame extracted from the video (green = RANSAC inliers, red = rejected)." if frame_pair else
         "the second photograph." if "PRELIMINARY" not in pair["experiment"] else
         "the PRELIMINARY synthetic view (green = RANSAC inliers, red = rejected)."))
+    if pair["ratio_test_matches"] < 30 or pair["ransac_inliers"] < 15:
+        r.p(f"Only {pair['ratio_test_matches']} matches passed the ratio test and {pair['ransac_inliers']} agreed with "
+            "the RANSAC model. With so few points a geometric model (a fundamental matrix needs at least 8) can be "
+            "fitted to wrong matches by chance, so these inliers are not reliable evidence of correspondence.")
+    if frame_pair:
+        r.p(MATCH_NOTE_VIDEO_FRAME)
+    elif "PRELIMINARY" not in pair["experiment"]:
+        r.p(MATCH_NOTE_PHOTOS)
+        same_scene = next((x for x in u4["pair_matching"] if "same scene" in x["experiment"]), None)
+        if same_scene:
+            r.figure("unit4/04b_matches_second_vs_second_b_same_scene.jpg",
+                     f"Second photograph vs photograph B of the same scene: {same_scene['ratio_test_matches']} matches, "
+                     f"{same_scene['ransac_inliers']} RANSAC inliers.", 12)
+            r.p(MATCH_NOTE_SAME_SCENE)
     mc = u4["matcher_comparison"]
     r.table("Brute-force versus FLANN matcher on the same pair (matcher_comparison.csv).",
             ["Matcher", "Ratio-test matches", "RANSAC inliers", "Matching time (ms)"],
@@ -734,13 +828,20 @@ def unit4_section(r: Report, u4):
                  "A real second photograph adds 3-D viewpoint change, pose and expression differences and new lighting, "
                  "which SIFT handles only partially, so fewer matches and more RANSAC-rejected outliers are expected.",
                  "Viewpoint: ")
+    elif frame_pair:
+        r.bullet(f"between the portrait and the video frame SIFT kept only {pair['ratio_test_matches']} ratio-test "
+                 "matches, compared with hundreds for rotated or resized copies of one image. A different scene "
+                 "(clothes, hair, background, lighting, expression and camera) changes nearly every local patch.",
+                 "Viewpoint and scene change: ")
     else:
-        r.bullet(f"between the two real photographs SIFT kept {pair['ratio_test_matches']} ratio-test matches, of which "
-                 f"{pair['ransac_inliers']} were consistent with one epipolar geometry. Real viewpoint, pose and lighting "
-                 "differences change local patches more than a pure image rotation or resize does.", "Viewpoint: ")
+        r.bullet(f"between the two real photographs SIFT kept only {pair['ratio_test_matches']} ratio-test matches "
+                 f"({pair['ransac_inliers']} RANSAC inliers, which the visual check shows are not true correspondences), "
+                 "compared with hundreds for rotated or resized copies of one image. The two photos differ in scene, "
+                 "clothing, hairstyle, lighting, camera and resolution, so almost no local patch is shared. SIFT is "
+                 "invariant to rotation and scale, not to a change of scene.", "Viewpoint and scene change: ")
     second_rows = u4.get("transform_matching_second_photo") or []
     if second_rows:
-        r.table("Original versus the second photograph before and after rotating/resizing the second photograph.",
+        r.table("Original versus the second image before and after rotating/resizing the second image.",
                 ["Experiment", "Ratio-test matches", "Match ratio", "RANSAC inliers"],
                 [(x["experiment"], x["ratio_test_matches"], f"{f2(x['match_ratio_pct'], 1)}%", x["ransac_inliers"])
                  for x in second_rows], [8, 3, 3, 3])
@@ -814,8 +915,30 @@ def unit5_detection_section(r: Report, d5):
         r.figure("unit5/detection/fig_video_frame_detections.png", "Haar and YOLO on frames of the original video.")
         r.table("Detections on video frames.", ["Frame", "Haar faces", "YOLO detections"],
                 [(x["frame_index"], x["haar_faces"], x.get("yolo_detections", "-")) for x in frames], [3, 3, 11])
+        if all(x["haar_faces"] == 0 for x in frames):
+            r.p(VIDEO_FRAME_NOTE)
     else:
         r.pending("Detection on frames of the self-recorded video (needs inputs/original_video.mp4).")
+    face_frames = d5.get("front_camera_frames") or []
+    if face_frames:
+        r.h("Frames of the front-camera video", 3)
+        r.p("The student also recorded a front-camera (selfie) clip. Five frames sampled evenly through it were used "
+            "for the same two detectors; this is the situation the frontal-face cascade is designed for.")
+        r.figure("unit5/detection/fig_front_camera_detections.png",
+                 "Haar faces (amber), eyes (light blue) and YOLO (blue) on frames of the front-camera video.")
+        r.table("Detections on front-camera frames (front_camera_frame_detections.csv).",
+                ["Frame", "Time (s)", "Haar faces", "Haar eye boxes", "YOLO detections"],
+                [(x["frame_index"], x["time_s"], x["haar_faces"], x["haar_eyes"], x.get("yolo_detections", "-"))
+                 for x in face_frames], [2.2, 2.2, 2.6, 3, 7])
+        found = sum(1 for x in face_frames if x["haar_faces"] >= 1)
+        extra = [x for x in face_frames if x["haar_faces"] > 1]
+        r.p(f"The Haar cascade found the face in {found} of {len(face_frames)} frames"
+            + (f", but in {len(extra)} of them it also returned a second, false face box lower in the image "
+               "(on the neck and T-shirt)" if extra else "")
+            + ". The eye cascade often returned more than two boxes per face, marking other dark features such as "
+              "the nostrils or mouth as eyes. YOLO labelled the person in every frame. Compared with the walking "
+              "video, where the face was seen from the side or behind, this shows how much the Haar cascade depends "
+              "on a frontal, upright face.")
     r.h("6.4 Face-specific cascade versus general object detector", 2)
     r.p("A Haar cascade answers a single yes/no question - 'is this window a frontal face?' - so it needs one cascade "
         "file per object type, gives no confidence score and is sensitive to rotation, pose and lighting, but it is tiny "
@@ -864,8 +987,29 @@ def unit5_motion_section(r: Report, m5):
         r.p(f"Agreement: the frame-differencing and MOG2 masks overlapped with a mean IoU of {f2(m5['mean_mask_iou'], 3)}, "
             f"and {f2(m5['mean_lk_moving_in_gmm_pct'], 1)}% of the moving Lucas-Kanade points fell inside the MOG2 "
             "foreground.")
-        r.placeholder("Observations: ", "[Describe what you see in the figures: where each method marks the moving "
-                                        "person/object, false motion from camera shake or lighting, and holes in the masks.]")
+        import csv
+
+        with open(OUT / "unit5/motion/per_frame_motion_statistics.csv", encoding="utf-8") as handle:
+            per_frame = [{k: float(v) for k, v in row.items() if v not in ("", None)} for row in csv.DictReader(handle)]
+        still = [x for x in per_frame if x["diff_foreground_pct"] < 0.1 and x["gmm_foreground_pct"] < 0.1]
+        top = max(per_frame, key=lambda x: x["gmm_foreground_pct"])
+        r.h("Observations", 3)
+        r.bullet(f"in {len(still)} of {len(per_frame)} frame pairs ({100 * len(still) / len(per_frame):.0f}%) both "
+                 "masks were practically empty. These are the moments when nobody is in view, so the still camera and "
+                 "the static room produced almost no false motion.", "No person, no motion: ")
+        r.bullet(f"frame differencing marked on average {f2(s[0]['mean_foreground_pct'])}% of the frame and MOG2 "
+                 f"{f2(s[1]['mean_foreground_pct'])}%. Differencing only marks the parts that changed since the previous "
+                 "frame, mainly the edges of the arms, legs and hair, so the plain black T-shirt is left hollow; MOG2 "
+                 "compares with the learned empty room and fills in much more of the body.", "Masks: ")
+        r.bullet(f"the largest MOG2 value was {f2(top['gmm_foreground_pct'], 1)}% at {top['time_s']:.1f} s, when the "
+                 "student was closest to the camera and covered a large part of the frame.", "Peak: ")
+        r.bullet(f"about {f2(s[2]['mean_moving_points'], 0)} of {f2(s[2]['mean_tracked_points'], 0)} tracked corners "
+                 f"moved per frame, at {f2(s[2]['mean_moving_speed_px_per_frame'])} px/frame on average; the moving "
+                 "points (green arrows) lie on the student's body, while corners on the window and bed stay still. "
+                 "Only optical flow gives the direction and speed of the motion.", "Lucas-Kanade: ")
+        r.bullet(f"frame differencing was the fastest ({f2(s[0]['mean_ms_per_frame'])} ms/frame), Lucas-Kanade "
+                 f"{f2(s[2]['mean_ms_per_frame'])} ms and MOG2 {f2(s[1]['mean_ms_per_frame'])} ms; all three run in real "
+                 "time at this resolution.", "Speed: ")
     r.table("Characteristics of the three techniques (general properties, not measurements).",
             ["Property", "Frame differencing", "GMM (MOG2)", "Lucas-Kanade"], [
                 ("Output", "Changed pixels between 2 frames", "Pixels unlike the learned background",
@@ -880,12 +1024,109 @@ def unit5_motion_section(r: Report, m5):
             ], [3.2, 4.4, 4.7, 4.7], font_size=8)
 
 
+WINDOW_CAPTIONS = {
+    "screenshot_01_original_display": "the original input photograph as displayed by main.py at the start of Unit 3 "
+                                      "(the clean reference image; size shown in the title).",
+    "screenshot_fig_gaussian_noise_comparison": "Gaussian noise and its Gaussian- and median-filtered restorations; "
+                                                "PSNR and SSIM against the original are printed above each panel.",
+    "screenshot_fig_salt_pepper_comparison": "salt-and-pepper noise and both restorations; the median filter removes "
+                                             "the black and white dots almost completely.",
+    "screenshot_fig_zoomed_face_comparison": "zoomed face crops used to judge visual quality next to the metrics.",
+    "screenshot_fig_thresholding": "grayscale portrait, histogram with the Otsu threshold, and the Otsu and adaptive "
+                                   "binary masks.",
+    "screenshot_fig_morphology": "erosion, dilation, opening and closing of the Otsu mask, with blob and hole counts.",
+    "screenshot_fig_canny": "Canny edges on the clean, noisy and median-restored portrait with edge-pixel percentages.",
+    "screenshot_fig_watershed_objects": "distance-transform watershed on the supplementary coins image (input, "
+                                        "background correction, mask, distance map, markers, regions).",
+    "screenshot_fig_watershed_portrait": "marker-based watershed separating the person from the backdrop.",
+    "screenshot_fig_hog": "HOG visualisations for 8, 16 and 32-pixel cells with feature-vector lengths.",
+    "screenshot_fig_sift_keypoints": "SIFT keypoints on the portrait and the 128-value descriptor of the strongest one.",
+    "screenshot_fig_matching_overview": "SIFT matches (green = RANSAC inliers, red = rejected) for the image pairs "
+                                        "and the rotated, resized and darkened copies.",
+    "screenshot_fig_rotation_scale_sweep": "number and correctness of SIFT matches against rotation angle and scale.",
+    "screenshot_fig_haar_vs_yolo_portrait": "Haar face/eye boxes next to the YOLO 'person' box with its confidence.",
+    "screenshot_fig_haar_min_neighbors": "Haar detections for minNeighbors 1-8, showing false boxes at low values.",
+    "screenshot_fig_rotation_robustness": "Haar and YOLO on rotated copies; the Haar face box disappears from 30 degrees.",
+    "screenshot_fig_video_frame_detections": "Haar and YOLO on frames sampled from the self-recorded video.",
+    "screenshot_fig_front_camera_detections": "Haar faces/eyes and YOLO on frames of the front-camera video, "
+                                              "including the false face and eye boxes.",
+    "screenshot_fig_consecutive_frames": "consecutive frames extracted from the video and their differences.",
+    "screenshot_fig_motion_snapshots": "frame differencing mask, MOG2 foreground mask and Lucas-Kanade vectors.",
+    "screenshot_fig_motion_timeseries": "per-frame foreground share, Lucas-Kanade speed and processing time.",
+}
+
+TERMINAL_TEXT = {
+    "check_inputs": "main.py --check-inputs lists which input files are present in the inputs folder.",
+    "unit3": "Run of Unit 3 (tasks 3A and 3B). The console shows the PSNR/SSIM of every filter and kernel size, the "
+             "Otsu threshold, the watershed result and one line for each figure window that was captured.",
+    "unit4": "Run of Unit 4. The warning confirms that the second photograph is missing, so the two-photo experiment "
+             "is reported as pending while the HOG, SIFT and transformation experiments complete.",
+    "unit5": "Run of Unit 5. Haar and YOLO results are printed with timings; task 5B reports the missing video as "
+             "pending instead of crashing.",
+    "tests": "The automated test suite (pytest -v): every test name and its result.",
+}
+
+
+def screenshots_section(r: Report):
+    r.h("8. Execution screenshots", 1)
+    index = load("screenshots_index.json")
+    if not index or not index.get("steps"):
+        r.pending("No screenshots captured yet - run python tools/capture_screenshots.py on Windows.")
+        return
+    steps = index["steps"]
+    r.p("The screenshots in this section are genuine captures of the project running on the computer described in "
+        "Section 2. tools/capture_screenshots.py opened a real console window (Windows PowerShell), ran each command in "
+        "it and, when the command had finished, captured that window with the Windows PrintWindow function. The unit "
+        "runs used python main.py --unit N --screenshots, which shows the main result figures in live windows while "
+        "the program runs and captures each window (window title 'figure displayed by main.py'). Only the program's own "
+        f"windows are captured. Screen: {index.get('screen', 'unknown')}.")
+    r.table("Captured runs (outputs/screenshots_index.json).", ["Step", "Command", "Captured", "Exit code", "Windows"],
+            [(s["title"], s["command"], s["finished"].replace("T", " "), s["exit_code"], len(s["window_screenshots"]))
+             for s in steps.values()], [2.8, 6.6, 3.6, 1.6, 1.6], font_size=8)
+
+    def shot(rel, caption, max_height_cm=15.0):
+        path = ROOT / rel
+        if not path.is_file():
+            return
+        from PIL import Image
+
+        with Image.open(path) as image:
+            w, h = image.size
+        r.figure(path, caption, min(16.5, max_height_cm * w / h))
+
+    groups = [("8.1 Input check", "check_inputs", None), ("8.2 Unit 3 - restoration and segmentation", "unit3", 3),
+              ("8.3 Unit 4 - HOG and SIFT", "unit4", 4), ("8.4 Unit 5 - Haar cascade, YOLO and motion", "unit5", 5),
+              ("8.5 Automated tests", "tests", None)]
+    for heading, key, unit in groups:
+        if key not in steps:
+            continue
+        s = steps[key]
+        r.h(heading, 2)
+        shot(s["terminal_screenshot"], f"Console screenshot - {TERMINAL_TEXT[key]} (captured {s['finished'][:16].replace('T', ' ')})")
+        for rel in s["window_screenshots"]:
+            stem = Path(rel).stem
+            text = WINDOW_CAPTIONS.get(stem, "result window.")
+            shot(rel, f"Screenshot of the live figure window - {text}", 13.5)
+        if key == "unit5" and not any("motion" in w or "consecutive" in w for w in s["window_screenshots"]):
+            r.pending("Screenshots of the video frames, frame differencing, MOG2 foreground masks and Lucas-Kanade "
+                      "motion vectors will be captured automatically by the same tool once inputs/original_video.mp4 "
+                      "has been added (python tools/capture_screenshots.py unit5).")
+        if key == "unit4" and not utils.find_input(config.DEFAULT_INPUT_DIR, "second_photo"):
+            r.pending("Screenshot of matching between two original photographs - needs inputs/second_photo.jpg (the "
+                      "matching overview above uses a frame extracted from the video).")
+
+
 def limitations_and_conclusion(r: Report, r3, s3, u4, d5, m5):
-    r.h("8. Limitations and pending work", 1)
+    r.h("9. Limitations and pending work", 1)
     items = []
     if not utils.find_input(config.DEFAULT_INPUT_DIR, "second_photo"):
-        items.append("Two-photo SIFT matching and the rotation/resizing of the second photo are pending until "
-                     "inputs/second_photo.jpg is added; the synthetic view is only a preliminary test.")
+        if utils.find_input(config.DEFAULT_INPUT_DIR, "second_image_video_frame"):
+            items.append("Unit 4 asks for a second photograph of the same object or scene. None was supplied, so a "
+                         "frame extracted from the student's video was used instead; it may not satisfy the "
+                         "requirement, and SIFT found no reliable matches with it. A second photograph is still needed.")
+        else:
+            items.append("Two-photo SIFT matching and the rotation/resizing of the second photo are pending until "
+                         "inputs/second_photo.jpg is added; the synthetic view is only a preliminary test.")
     if not m5:
         items.append("All motion-estimation results and detections on video frames are pending until "
                      "inputs/original_video.mp4 (15-30 s, self-recorded) is added.")
@@ -899,7 +1140,7 @@ def limitations_and_conclusion(r: Report, r3, s3, u4, d5, m5):
              "effect but does not reproduce real 3-D viewpoint changes.")
     r.bullet("Timings were measured on a laptop CPU (no GPU) and vary between runs.")
 
-    r.h("9. Conclusion", 1)
+    r.h("10. Conclusion", 1)
     if r3:
         sb = r3["best"]["Salt-and-pepper noise"]["by_psnr"]
         gauss_rows = [x for x in r3["metrics"] if x["noise"] == "Gaussian noise" and x["kernel"] is not None]
@@ -921,7 +1162,9 @@ def limitations_and_conclusion(r: Report, r3, s3, u4, d5, m5):
         rot = [x for x in u4["transform_matching_original"] if x["transform"] == "rotation"]
         r.p(f"Features: HOG captured the overall shape of the portrait, and SIFT matching stayed accurate under rotation "
             f"(at least {min(x['correct_matches_pct'] for x in rot):.0f}% correct matches), scaling and lighting "
-            "changes; the number of matches drops mainly when the image becomes small.")
+            "changes; the number of matches drops mainly when the image becomes small. Matching the portrait with the "
+            "second photograph gave no reliable correspondences, because the two photos share almost no local texture "
+            "(different scene, clothes and lighting); even two low-resolution photos of the same scene matched poorly.")
     if d5:
         rot = d5["rotation_robustness"]
         haar_miss = [x["angle_deg"] for x in rot if x["haar_faces"] == 0]
@@ -940,14 +1183,19 @@ def limitations_and_conclusion(r: Report, r3, s3, u4, d5, m5):
             text += (f" but returned a duplicate box at {', '.join(str(a) for a in dup)} degrees." if dup else ".")
         r.p(text)
     if m5:
-        r.p("Motion: see Section 7 for the measured comparison of the three techniques on the self-recorded video.")
+        ms = m5["summary"]
+        r.p(f"Motion: on the self-recorded video MOG2 gave the most complete foreground masks "
+            f"({f2(ms[1]['mean_foreground_pct'])}% of the frame on average versus {f2(ms[0]['mean_foreground_pct'])}% for "
+            "frame differencing, which leaves the uniform T-shirt hollow), frame differencing was the fastest, and "
+            "Lucas-Kanade was the only method that gave the direction and speed of the motion.")
     else:
         r.p("Motion estimation is implemented and tested, and its results will be added once the self-recorded video "
             "is supplied.")
 
-    r.h("10. Git repository and explanation video", 1)
-    r.placeholder("Git repository URL: ", GIT_URL_PLACEHOLDER)
-    r.placeholder("Project explanation video (Google Drive): ", VIDEO_URL_PLACEHOLDER)
+    r.h("11. Git repository and explanation video", 1)
+    r.p(GIT_URL, bold_prefix="Git repository URL: ")
+    r.p("Branch: main (GitHub account: github.com/Kritikakumrawat).", size=9.5)
+    r.p(VIDEO_URL, bold_prefix="Project explanation video (Google Drive): ")
     r.p("Access for the instructor must be granted on both the repository and the Google Drive folder (see "
         "docs/SUBMISSION_CHECKLIST.md).", italic=True, size=9.5)
 
@@ -964,12 +1212,17 @@ def appendix(r: Report):
         ("src/feature_extraction.py", "HOG, SIFT, BF/FLANN matching, RANSAC, rotation/scale/lighting experiments"),
         ("src/object_detection.py", "Haar cascade face/eye detection, YOLO detection, robustness experiments"),
         ("src/motion_estimation.py", "Video validation, frame differencing, MOG2, Lucas-Kanade, output video/GIF"),
+        ("src/screen_capture.py", "Windows window capture (PrintWindow) used for the execution screenshots"),
         ("tests/", "Automated tests (pytest) on synthetic and public sample data"),
+        ("tools/capture_screenshots.py", "Runs each unit in a real console window and captures the screenshots"),
+        ("tools/extract_video_frame.py", "Extracts and documents the clearest face frame from the student's video"),
         ("tools/build_report.py", "Builds this report from the outputs"),
+        ("tools/export_pdf.py", "Updates the contents page and exports the PDF with Microsoft Word"),
     ], [5, 12])
     r.h("Appendix B - How to reproduce", 1)
     for line in ("python -m venv .venv", r".venv\Scripts\activate", "pip install -r requirements.txt",
-                 "python main.py --all", "python -m pytest", "python tools/build_report.py"):
+                 "python main.py --all", "python -m pytest", "python tools/capture_screenshots.py",
+                 "python tools/build_report.py", "python tools/export_pdf.py"):
         paragraph = r.doc.add_paragraph()
         run = paragraph.add_run(line)
         run.font.name = "Consolas"
@@ -992,6 +1245,7 @@ def build(path: Path = REPORT_PATH) -> Path:
     unit4_section(report, u4)
     unit5_detection_section(report, d5)
     unit5_motion_section(report, m5)
+    screenshots_section(report)
     limitations_and_conclusion(report, r3, s3, u4, d5, m5)
     appendix(report)
     report.save(path)

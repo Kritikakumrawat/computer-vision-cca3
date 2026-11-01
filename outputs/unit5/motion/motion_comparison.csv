@@ -1,0 +1,4 @@
+technique,mean_foreground_pct,mean_regions_per_frame,mean_ms_per_frame,output,mean_tracked_points,mean_moving_points,mean_moving_speed_px_per_frame
+Frame differencing,2.0743606982711893,2.0994587280108252,0.8611337619608221,Binary mask of pixels that changed since the previous frame,,,
+GMM background subtraction (MOG2),4.3347196794820775,1.6813261163734776,6.284093639923005,Binary mask of pixels that differ from the learned background,,,
+Lucas-Kanade optical flow,,,2.5280826114416937,Sparse motion vectors (direction and speed) at corner points,199.69215155615697,22.87144790257104,2.0650920001676507

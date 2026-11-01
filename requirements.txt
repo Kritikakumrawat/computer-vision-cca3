@@ -16,4 +16,4 @@ pillow>=10                  # tested 13.0.0 - GIF writing
 # Report generation and tests
 python-docx>=1.1            # tested 1.2.0 - tools/build_report.py
 pytest>=8                   # tested 9.1.1
-pywin32>=306; sys_platform == "win32"   # optional - tools/export_pdf.py drives Microsoft Word to make the PDF
+pywin32>=306; sys_platform == "win32"   # Windows only - execution screenshots (tools/capture_screenshots.py) and PDF export via Word

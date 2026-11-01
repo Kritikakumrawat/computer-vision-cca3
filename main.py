@@ -46,6 +46,8 @@ def parse_args(argv=None):
     parser.add_argument("--skip-yolo", action="store_true", help="do not load or run YOLO")
     parser.add_argument("--yolo-model", default=None, help=f"YOLO weights name (default {config.DETECTION['yolo_model']})")
     parser.add_argument("--show", action="store_true", help="also open each figure in a window")
+    parser.add_argument("--screenshots", action="store_true",
+                        help="Windows: show the main figures on screen and save a screenshot of each window")
     parser.add_argument("--verbose", action="store_true", help="more detailed log messages")
     return parser.parse_args(argv)
 
@@ -60,7 +62,10 @@ def input_status(input_dir: Path) -> dict:
 
 def print_input_status(status: dict) -> None:
     print("\nInput files:")
-    notes = {"watershed_photo": "(optional - a scikit-image sample is used if absent)"}
+    notes = {"watershed_photo": "(optional - a scikit-image sample is used if absent)",
+             "front_camera_video": "(optional - extra face-detection frames for Unit 5A)",
+             "second_photo_b": "(optional - extra same-scene pair for Unit 4)",
+             "second_image_video_frame":"(optional - video frame used for Unit 4 only if second_photo is missing)"}
     for key, name in status.items():
         mark = f"found: {name}" if name else "MISSING " + notes.get(key, "")
         print(f"  {key:<16} {mark}")
@@ -88,7 +93,7 @@ def run_task(code: str, name: str, module_name: str, paths: utils.ProjectPaths, 
 def main(argv=None) -> int:
     args = parse_args(argv)
     utils.setup_logging(args.verbose)
-    utils.configure_display(args.show)
+    utils.configure_display(args.show, args.screenshots)
     paths = utils.ProjectPaths(args.inputs, args.outputs, args.models)
     status = input_status(paths.input_dir)
     print_input_status(status)

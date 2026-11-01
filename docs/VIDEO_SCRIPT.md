@@ -8,7 +8,7 @@ show real motion results.
 
 Suggested tools: OBS Studio or the Windows Snipping Tool (screen + microphone),
 webcam in a corner if allowed. Upload to the instructor's Google Drive folder and
-paste the link into the report (Section 10).
+paste the link into the report (Section 11).
 
 ---
 
@@ -79,7 +79,7 @@ and point to `add_salt_and_pepper_noise` and `compare_with_reference`.
 
 ## 6:45 – 7:30  Live demo and conclusion
 - Run `python main.py --unit 3` (or `--check-inputs`) in the terminal and show
-  that outputs are regenerated; mention `python -m pytest` (31 tests).
+  that outputs are regenerated; mention `python -m pytest` (34 tests).
 - Summarise: best technique per task, one limitation each, what you learned.
 
 ---

@@ -247,22 +247,70 @@ plt.rcParams.update(
 )
 
 _SHOW_FIGURES = False
+_SCREENSHOT_FIGURES: set[str] = set()  # figure names to show on screen and capture (empty = off)
 
 
-def configure_display(show: bool) -> None:
-    """Call with True to also open each figure in a window (python main.py --show)."""
-    global _SHOW_FIGURES
+def configure_display(show: bool, screenshots: bool = False) -> None:
+    """show=True opens each figure in a window (python main.py --show).
+
+    screenshots=True (python main.py --screenshots, Windows only) briefly shows the
+    figures listed in config.SCREENSHOT_FIGURES on screen while the program runs
+    and saves a picture of each window as screenshot_<figure>.jpg next to it.
+    """
+    global _SHOW_FIGURES, _SCREENSHOT_FIGURES
     _SHOW_FIGURES = show
-    if show:
+    _SCREENSHOT_FIGURES = set(config.SCREENSHOT_FIGURES) if screenshots else set()
+    if screenshots:
+        from src import screen_capture
+
+        screen_capture.require_windows()
+        screen_capture.enable_dpi_awareness()
+        # Without the toolbar the window is exactly as wide as the figure, so narrow
+        # figures are not stretched (the toolbar has a fixed minimum width).
+        plt.rcParams["toolbar"] = "None"
+    if show or screenshots:
         plt.switch_backend("TkAgg")
 
 
+def _capture_figure_window(fig, shot_path: Path) -> Path:
+    """Show a live figure in its own window, fit it to the screen and capture that window."""
+    from src import screen_capture
+
+    manager = fig.canvas.manager
+    window = manager.window
+    scale = screen_capture.scale_factor()
+    left, top, right, bottom = screen_capture.work_area()
+    max_width = 0.97 * (right - left)
+    max_height = (bottom - top) - 140 * scale  # room for the title bar and toolbar
+    width_in, height_in = fig.get_size_inches()
+    display_dpi = min(100.0, max_width / (width_in * scale), max_height / (height_in * scale))
+    fig._original_dpi = display_dpi  # same layout, just drawn smaller so the whole window fits
+    fig.set_dpi(display_dpi)
+    manager.set_window_title(f"CCA3 - {shot_path.stem.replace('screenshot_', '')} (figure displayed by main.py)")
+    window.geometry(f"+{left}+{top}")
+    manager.show()
+    window.attributes("-topmost", True)
+    for _ in range(4):  # let Tk map, resize and paint the window
+        window.update()
+        time.sleep(0.25)
+    fig.canvas.draw()
+    window.update()
+    time.sleep(0.3)
+    window.update()
+    image = screen_capture.grab_window(int(window.wm_frame(), 16))
+    window.attributes("-topmost", False)
+    return screen_capture.save_image(image, shot_path)
+
+
 def finish_figure(fig, path: Path | str, dpi: int = 130) -> Path:
-    """Save a matplotlib figure, optionally show it, then free its memory."""
+    """Save a matplotlib figure, optionally show/capture it, then free its memory."""
     path = Path(path)
     ensure_dir(path.parent)
     fig.savefig(path, dpi=dpi, bbox_inches="tight")
-    if _SHOW_FIGURES:
+    if path.stem in _SCREENSHOT_FIGURES:
+        shot = _capture_figure_window(fig, path.with_name(f"screenshot_{path.stem}.jpg"))
+        LOG.info("Screenshot of the displayed figure saved: %s", shot.name)
+    elif _SHOW_FIGURES:
         plt.show()
     plt.close(fig)
     return path

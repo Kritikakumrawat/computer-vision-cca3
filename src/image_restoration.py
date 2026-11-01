@@ -110,9 +110,9 @@ def _plot_metric_vs_kernel(rows: list[dict], kernel_sizes: list[int], path):
             if row == 0:
                 ax.set_title(noise, fontweight="bold")
     handles, labels = axes[0][0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", ncol=2, bbox_to_anchor=(0.5, 1.02))
-    fig.suptitle("Restoration quality versus filter kernel size", y=1.07, fontweight="bold")
-    fig.tight_layout()
+    fig.legend(handles, labels, loc="upper center", ncol=2, bbox_to_anchor=(0.5, 0.955))
+    fig.suptitle("Restoration quality versus filter kernel size", y=0.995, fontweight="bold")
+    fig.tight_layout(rect=(0, 0, 1, 0.91))
     return utils.finish_figure(fig, path)
 
 
@@ -164,7 +164,15 @@ def run(paths: utils.ProjectPaths, options: dict | None = None) -> dict:
                 metrics = compare_with_reference(original, result)
                 rows.append({"noise": noise_name, "method": method_name, "kernel": k, **metrics, "time_ms": t["ms"]})
                 restored[(noise_name, method_name, k)] = result
-                LOG.info("%-22s %-15s k=%d  %s", noise_name, method_name, k, _fmt(metrics))
+                LOG.debug("%-22s %-15s k=%d  %s", noise_name, method_name, k, _fmt(metrics))
+    # Compact console summary: one line per noise type and filter (PSNR dB / SSIM per kernel)
+    for noise_name in noisy:
+        base = next(r for r in rows if r["noise"] == noise_name and r["kernel"] is None)
+        LOG.info("%s - noisy input: %s", noise_name, _fmt(base))
+        for method_name in FILTERS:
+            parts = [f"{r['kernel']}x{r['kernel']} {r['psnr_db']:.2f}/{r['ssim']:.3f}"
+                     for r in rows if r["noise"] == noise_name and r["method"] == method_name]
+            LOG.info("  %-15s PSNR dB/SSIM: %s", method_name, " | ".join(parts))
 
     k = params["default_kernel"]
     short = {"Gaussian noise": "gaussian_noise", "Salt-and-pepper noise": "salt_pepper"}
